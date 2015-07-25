@@ -1,0 +1,554 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>数据库的事务学习 | 最初的梦想</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Neo">
+    
+
+    
+    <meta name="description" content="1.事务的概念事务是数据库中，执行的一个逻辑单元。该逻辑单元由有限的数据库操作序列组成。之所以有事务的存在，是为了满足数据库中数据的一致性。有时候，多个操作序列之间必须满足某些关系，以保证数据库数据的完整。事务具有的ACID四大特性，可以看做是满足某些关系，对数据库进行操作的工具。
+2.事务的ACID属性原子性 事务必须是原子工作单元，对于其数据修改，要么全都执行，要么全都不执行。一致性 事务在完">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库的事务学习">
+<meta property="og:url" content="https://github.com/neo-v/neo-v.github.io/2015-05-16/transaction/index.html">
+<meta property="og:site_name" content="最初的梦想">
+<meta property="og:description" content="1.事务的概念事务是数据库中，执行的一个逻辑单元。该逻辑单元由有限的数据库操作序列组成。之所以有事务的存在，是为了满足数据库中数据的一致性。有时候，多个操作序列之间必须满足某些关系，以保证数据库数据的完整。事务具有的ACID四大特性，可以看做是满足某些关系，对数据库进行操作的工具。
+2.事务的ACID属性原子性 事务必须是原子工作单元，对于其数据修改，要么全都执行，要么全都不执行。一致性 事务在完">
+<meta property="og:updated_time" content="2015-07-25T01:18:12.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="数据库的事务学习">
+<meta name="twitter:description" content="1.事务的概念事务是数据库中，执行的一个逻辑单元。该逻辑单元由有限的数据库操作序列组成。之所以有事务的存在，是为了满足数据库中数据的一致性。有时候，多个操作序列之间必须满足某些关系，以保证数据库数据的完整。事务具有的ACID四大特性，可以看做是满足某些关系，对数据库进行操作的工具。
+2.事务的ACID属性原子性 事务必须是原子工作单元，对于其数据修改，要么全都执行，要么全都不执行。一致性 事务在完">
+
+    
+    <link rel="alternative" href="/atom.xml" title="最初的梦想" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.png">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/pacman.png" alt="最初的梦想" title="最初的梦想"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="最初的梦想">最初的梦想</a></h1>
+				<h2 class="blog-motto">hello world！</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:github.com/neo-v/neo-v.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015-05-16/transaction/" title="数据库的事务学习" itemprop="url">数据库的事务学习</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="https://github.com/neo-v/neo-v.github.io/about" title="Neo" target="_blank" itemprop="author">Neo</a>
+		
+  <p class="article-time">
+    <time datetime="2015-05-16T14:59:04.000Z" itemprop="datePublished"> 发表于 May 16 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			
+		
+		</div>
+		
+		<p><strong>1.事务的概念</strong><br>事务是数据库中，执行的一个逻辑单元。该逻辑单元由有限的数据库操作序列组成。之所以有事务的存在，是为了满足数据库中数据的一致性。有时候，多个操作序列之间必须满足某些关系，以保证数据库数据的完整。事务具有的ACID四大特性，可以看做是满足某些关系，对数据库进行操作的<strong>工具</strong>。</p>
+<p><strong>2.事务的ACID属性</strong><br><strong>原子性</strong> 事务必须是原子工作单元，对于其数据修改，要么全都执行，要么全都不执行。<br><strong>一致性</strong> 事务在完成时，必须使所有的数据都保持一致状态。一致性是数据库中的难点。个人理解是对数据的操作满足约束关系。<br><strong>隔离性</strong> 由并发事务所作的修改必须与任何其他并发事务所作的修改隔离。隔离性是数据库中的并发控制。这个类似于多线程的线程同步。由于事务的特点，事务需要串行化。<br><strong>持久性</strong> 已被提交的事务对数据库的修改应该永久保存在数据库中。</p>
+<p><strong>3.事务的并发的问题</strong><br>对于事务，为了保持一致性，最主要的是进行隔离。类似线程同步。数据库的操作也要同步，比如A事务读数据，B事务写数据，那么A,B事务必须串行化。否则可能出现问题。<strong>一般有如下四类问题</strong>：</p>
+<ul>
+<li><strong>脏读</strong> 读到数据库没有的数据。比如A事务读数据，在这之前B事务写了数据，在A读后，有回滚了数据。可以认为是<strong>写-&gt;读-&gt;写</strong>问题</li>
+<li><strong>不可重复读</strong>：A事务读取两次数据，但是中间被B事务修改了数据，导致A两次数据不统一。可以认为是<strong>读-&gt;写-&gt;读</strong>问题</li>
+<li><strong>幻读</strong>： 在A事务读取数据的时候，B事务插入数据。A 再次读取出现记录不同的情况。可以认为是<strong>读-&gt;插入-&gt;读</strong>问题</li>
+<li><strong>更新丢失</strong>： 两事务更新数据，其中一个事务的更新可能会将另一个更新覆盖。可以认为是<strong>读-&gt;读-&gt;更新-&gt;更新</strong>问题</li>
+</ul>
+<p><strong>4.并发问题的解决思路</strong><br>针对上述问题，数据库该如何解决。方法就是加锁。<strong>所谓加锁，就是对共享资源的访问进行某种限制，以满足特定的业务场景</strong>。<br>比如针对脏读的问题，在事务B进行写操作提交之前对数据加锁，限制A事务读取，以保证无论回滚还是成功之后，A在读取数据，就不会又该问题。但是加锁一般都有性能损失。根据需求的不同，锁也可以有多种类型，根据加锁的时间不同，隔离的级别也有不同。很多时候没必要事务完全串行化。</p>
+<p><strong>5.数据库中的锁</strong><br>以SQL SERVER 为例。<br><strong>共享锁（S 锁）</strong>允许并发事务在封闭式并发控制下读取(SELECT)资源，资源上存在共享锁（S 锁）时，任何其他事务都不能修改数据。<br><strong>排他锁（X 锁）</strong>可以防止并发事务对资源进行访问。使用排他锁（X 锁）时，任何其他事务都无法修改数据。<br><strong>更新锁（U 锁）</strong>可以防止常见的死锁。更新锁是一种过渡锁。因为排它锁将阻止所有访问，很可能造成死锁。比如同一资源，A和B事务都加了S锁进行读取，随后都要进行更新，A和B都等待对方释放S锁，从而将自己升级为X锁。结果造成死锁。更新锁在于锁定之后，该事务拥有了修改的排他权利，其他更新将不能加锁，但是，他又容许其他事务读数据，也就是U锁也S锁兼容。可以认为是<strong>温和的排他锁</strong></p>
+<p><strong>6.事务中的隔离级别</strong><br>一般情况下，数据库引擎已经做了相应的隔离处理，不用用户手动加锁。根据需求的不同，sqlserver 有以下隔离级别。不同的隔离级别，隔离程度不同，对应的事务处理场景也不同。解决问题的程度不同。默认为<strong>READ COMMITTED</strong>。实现上，不同的隔离级别，加锁的时间和范围不同。</p>
+<ul>
+<li><strong>READ UNCOMMITTED</strong> 在读数据时不会检查或使用任何锁。因此，在这种隔离级别中可能读取到没有提交的数据。</li>
+<li><strong>READ COMMITTED</strong><br>只读取提交的数据并等待其他事务释放排他锁，共享锁立即释放。</li>
+<li><strong>REPEATABLE READ</strong><br>共享锁加到事务结束。</li>
+<li><strong>SNAPSHOT</strong><br>读取数据的快照，可以解决不可重复读的问题。</li>
+<li><strong>SERIALIZABLE</strong><br>加范围锁定，组织insert插入，解决了幻读。</li>
+</ul>
+<p><strong>7.实际应用</strong><br>学习了数据库的事务概念，在编写SQL语句的时候，合理利用事务的隔离级别。事务具体语法可以参看帮助文档，主要理清楚自己业务场景下的事务并发会出现的状况，做合理控制。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/数据库/">数据库</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/事务/">事务</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://github.com/neo-v/neo-v.github.io/2015-05-16/transaction/" data-title="数据库的事务学习 | 最初的梦想" data-tsina="undefined" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015-05-18/programer-life/" title="成为优秀程序员">
+  <strong>上一篇：</strong><br/>
+  <span>
+  成为优秀程序员</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015-05-09/datetime/"  title="sql server 数据类型转换">
+ <strong>下一篇：</strong><br/> 
+ <span>sql server 数据类型转换
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ 
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/javascript/" title="javascript">javascript<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/体系结构/" title="体系结构">体系结构<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/分布式系统/" title="分布式系统">分布式系统<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/助教/" title="助教">助教<sup>8</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/工程理论实践/" title="工程理论实践">工程理论实践<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/操作系统/" title="操作系统">操作系统<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/日志/" title="日志">日志<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法和数据结构/" title="算法和数据结构">算法和数据结构<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/编码/" title="编码">编码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/计算理论/" title="计算理论">计算理论<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/assistant，embed，Galileo/" title="assistant，embed，Galileo">assistant，embed，Galileo<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/assistant/" title="assistant">assistant<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/javascript/" title="javascript">javascript<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/life/" title="life">life<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/exec/" title="exec">exec<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/单例模式/" title="单例模式">单例模式<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/side-effect/" title="side-effect">side-effect<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pthread/" title="pthread">pthread<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/线程同步/" title="线程同步">线程同步<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/beauty-of-programming/" title="beauty of programming">beauty of programming<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/prototype/" title="prototype">prototype<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/oop/" title="oop">oop<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存，分布式，CDN/" title="缓存，分布式，CDN">缓存，分布式，CDN<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/process/" title="process">process<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fork/" title="fork">fork<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/journal/" title="journal">journal<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/软件开发/" title="软件开发">软件开发<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/linux-process/" title="linux,process">linux,process<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CONVERT-CAST/" title="CONVERT,CAST">CONVERT,CAST<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/闭包/" title="闭包">闭包<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="weiboshow">
+  <p class="asidetitle">我的微博</p>
+   <iframe width="100%" height="400" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=400&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=0&uid=2115828167&verifier=7b807bb3&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello,I&#39;m neo <br/>
+			nice to meet you</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/https://github.com/neo-v" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:pirloandkaka@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="https://github.com/neo-v/neo-v.github.io/about" target="_blank" title="Neo">Neo</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

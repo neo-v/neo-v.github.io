@@ -1,0 +1,553 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>javascript 闭包的理解 | 最初的梦想</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Neo">
+    
+
+    
+    <meta name="description" content="JavaScript 闭包的理解。闭包在编程语言中出现的很灵活，不只有JavaScript中有，只是在JavaScript中明确有闭包的概念，在学习了相关知识后，可以发现闭包在编程语言是个很重要的特征，不只是简单的语法糖。学习闭包加深对编程语言理论中关于变量作用域，生存周期，垃圾回收的理解。参考自博文http://jibbering.com/faq/notes/closures/和松本行弘的书《代">
+<meta property="og:type" content="article">
+<meta property="og:title" content="javascript 闭包的理解">
+<meta property="og:url" content="https://github.com/neo-v/neo-v.github.io/2015-07-18/closure/index.html">
+<meta property="og:site_name" content="最初的梦想">
+<meta property="og:description" content="JavaScript 闭包的理解。闭包在编程语言中出现的很灵活，不只有JavaScript中有，只是在JavaScript中明确有闭包的概念，在学习了相关知识后，可以发现闭包在编程语言是个很重要的特征，不只是简单的语法糖。学习闭包加深对编程语言理论中关于变量作用域，生存周期，垃圾回收的理解。参考自博文http://jibbering.com/faq/notes/closures/和松本行弘的书《代">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/ce.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/scope.png">
+<meta property="og:updated_time" content="2015-07-25T01:18:12.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="javascript 闭包的理解">
+<meta name="twitter:description" content="JavaScript 闭包的理解。闭包在编程语言中出现的很灵活，不只有JavaScript中有，只是在JavaScript中明确有闭包的概念，在学习了相关知识后，可以发现闭包在编程语言是个很重要的特征，不只是简单的语法糖。学习闭包加深对编程语言理论中关于变量作用域，生存周期，垃圾回收的理解。参考自博文http://jibbering.com/faq/notes/closures/和松本行弘的书《代">
+
+    
+    <link rel="alternative" href="/atom.xml" title="最初的梦想" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.png">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/pacman.png" alt="最初的梦想" title="最初的梦想"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="最初的梦想">最初的梦想</a></h1>
+				<h2 class="blog-motto">hello world！</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:github.com/neo-v/neo-v.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015-07-18/closure/" title="javascript 闭包的理解" itemprop="url">javascript 闭包的理解</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="https://github.com/neo-v/neo-v.github.io/about" title="Neo" target="_blank" itemprop="author">Neo</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-18T15:20:45.000Z" itemprop="datePublished"> 发表于 Jul 18 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#函数对象"><span class="toc-number">1.</span> <span class="toc-text">函数对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#高阶函数"><span class="toc-number">2.</span> <span class="toc-text">高阶函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#函数指针的局限"><span class="toc-number">3.</span> <span class="toc-text">函数指针的局限</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#上下文环境"><span class="toc-number">4.</span> <span class="toc-text">上下文环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JavaScript作用域"><span class="toc-number">5.</span> <span class="toc-text">JavaScript作用域</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#变量生存周期"><span class="toc-number">6.</span> <span class="toc-text">变量生存周期</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#闭包形成"><span class="toc-number">7.</span> <span class="toc-text">闭包形成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#面向对象和闭包"><span class="toc-number">8.</span> <span class="toc-text">面向对象和闭包</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#闭包应用场景"><span class="toc-number">9.</span> <span class="toc-text">闭包应用场景</span></a></li></ol>
+		
+		</div>
+		
+		<p>JavaScript <strong>闭包</strong>的理解。<br>闭包在编程语言中出现的很灵活，不只有JavaScript中有，只是在JavaScript中<strong>明确有闭包</strong>的概念，在学习了相关知识后，可以发现闭包在编程语言是个很重要的特征，不只是简单的<strong>语法糖</strong>。<br>学习闭包加深对编程语言理论中关于<strong>变量作用域，生存周期，垃圾回收</strong>的理解。<br>参考自博文<a href="http://jibbering.com/faq/notes/closures/" target="_blank" rel="external">http://jibbering.com/faq/notes/closures/</a><br>和松本行弘的书<strong>《代码的未来》</strong></p>
+<h2 id="函数对象">函数对象</h2><p>所谓函数对象，在并一定是对象，在C等语言里，函数不是一等公民(first class)，也不是对象。这里主要是值对数据进行操作的代码。这样c/c++里的函数指针也能有同样的功能。<br>定义举例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int (*time)(int);</span><br></pre></td></tr></table></figure></p>
+<h2 id="高阶函数">高阶函数</h2><p>函数对象的作用体现在 高阶函数中，也就是 函数参数包含函数。<br>比如：<br>func_a (a,b,func_b())<br>高阶函数的作用，是提高了代码的通用性，比如 简单的 排序函数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">void qsort(void *base, size_t nmemb, size_t size, int (*compar)(const void *,const void *))</span><br></pre></td></tr></table></figure></p>
+<p>实现对任意数据类型进行快排。<br>实现的原理，就是在于函数指针。<br>通过调用自己实现的compare函数，将类型做自己需要的转换。实现的代码的通用。<br>说白了。就是将操作的数据和操作的行为分开，将操作转移到外部函数中。</p>
+<h2 id="函数指针的局限">函数指针的局限</h2><p>上述的qsort，有个局限，他无法访问调用函数，在调用qsort 是的局部变量。除非通过参数传递或者申明变量为全局。</p>
+<p>比如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int compare (const void*,const void*) //&#22768;&#26126;&#20989;&#25968;&#10;&#10;//&#35843;&#29992;&#20989;&#25968;&#10;func_a ()&#10;&#123;&#10;    int  i = 0; //&#23616;&#37096;&#21464;&#37327;&#10;        &#10;    qsort(array,length,sizeof(int),compare);//&#35843;&#29992;&#39640;&#38454;&#20989;&#25968;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>compare() 无法访问 变量i。<br>于是有了闭包。<br>函数对象，<strong>对外部自由变量的进行访问</strong>，是构成要件之一。</p>
+<h2 id="上下文环境">上下文环境</h2><p><strong>execution context</strong>，在说到闭包的时候，这个词反复出现。我理解，把程序看成是<strong>状态机</strong>，上下文环境指的应该是<strong>当前代码</strong>可以看到的状态，比如堆栈数据，全局数据，或者函数。不同的语言，维护这套数据，有不一样的<strong>机制</strong>。我们当前代码对数据的操作，是反映在当前上下文的状态变化上的。<br>维护execution context的机制，必须提供当前操作所需数据的位置，函数调用的位置。还涉及作用域的概念。<br>举例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var a = 10; // &#20840;&#23616;&#19978;&#19979;&#25991;&#20013;&#30340;&#21464;&#37327;&#10;(function () &#123;&#10;  var b = 20; // &#20989;&#25968;&#19978;&#19979;&#25991;&#20013;&#30340;&#23616;&#37096;&#21464;&#37327;&#10;&#125;)();&#10;alert(a); // 10&#10;alert(b); // &#34;b&#34; is not defined</span><br></pre></td></tr></table></figure></p>
+<p>js如何维护？由于函数是对象，顺理成章的，函数调用的上下文，挂在函数对象上，成为一个<strong>property</strong>。这种机制 称之为<strong>变量对象(variable object)</strong>。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">activeExecutionContext = &#123;&#10;  VO: &#123;&#10;    // &#19978;&#19979;&#25991;&#20013;&#30340;&#25968;&#25454; (&#21464;&#37327;&#22768;&#26126;&#65288;var&#65289;, &#20989;&#25968;&#22768;&#26126;&#65288;FD), &#20989;&#25968;&#24418;&#21442;&#65288;function arguments&#65289;)&#10;  &#125;&#10;&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>在函数调用中，有一个进入上下文环境的阶段。多次函数调用形成EC Stack，处于顶部的为激活的EC。<br>首先，AO(activiation object)被创建，和VO的结构是一样的，用来保存状态。<br>其次，AO初始化，进行赋值，顺序为：</p>
+<ul>
+<li>函数的形参（当进入函数执行上下文时）变量对象的一个属性，其属性名就是形参的名字，其值就是实参的值；对于没有传递的参数，其值为undefined</li>
+<li>函数声明（FunctionDeclaration, FD） —— 变量对象的一个属性，其属性名和值都是函数对象创建出来的；如果变量对象已经包含了相同名字的属性，则替换它的值</li>
+<li>变量声明（var，VariableDeclaration） —— 变量对象的一个属性，其属性名即为变量名，其值为undefined;<strong>如果变量名和已经声明的函数名或者函数的参数名相同，则不会影响已经存在的属性</strong>。</li>
+</ul>
+<p>举例：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">alert(x); <span class="comment">// function</span></span><br><span class="line"><span class="keyword">var</span> x = <span class="number">10</span>;</span><br><span class="line">alert(x); <span class="comment">// 10</span></span><br><span class="line">x = <span class="number">20</span>；</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">x</span>(<span class="params"></span>) </span>&#123;&#125;;</span><br><span class="line">alert(x); <span class="comment">// 20</span></span><br></pre></td></tr></table></figure></p>
+<p>在进入上下文的阶段<br>VO填充为如下形式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">VO = &#123;&#125;;&#10;VO[&#39;x&#39;] = &#60;&#24341;&#29992;&#20102;&#20989;&#25968;&#22768;&#26126;&#8220;x&#8221;&#62;&#10;// &#21457;&#29616;var x = 10;&#10;// &#22914;&#26524;&#20989;&#25968;&#8220;x&#8221;&#36824;&#26410;&#23450;&#20041;&#10;// &#21017; &#34;x&#34; &#20026;undefined, &#20294;&#26159;&#65292;&#22312;&#25105;&#20204;&#30340;&#20363;&#23376;&#20013;&#10;// &#21464;&#37327;&#22768;&#26126;&#24182;&#19981;&#20250;&#24433;&#21709;&#21516;&#21517;&#30340;&#20989;&#25968;&#20540;&#10;VO[&#39;x&#39;] = &#60;&#20540;&#19981;&#21463;&#24433;&#21709;&#65292;&#20173;&#26159;&#20989;&#25968;&#62;</span><br></pre></td></tr></table></figure></p>
+<p>note：VO和AO不含有原型prototye<br><strong>CE还包括 this 和 scope</strong><br><img src="/assert/ce.png"></p>
+<h2 id="JavaScript作用域">JavaScript作用域</h2><p>这里来说作用域，所谓作用域就是标识符可以访问点范围。不如我们常说的局部变量，全局变量等，在代码中访问范围不同。不同的语言对于作用域实现机制不同。我们来说JavaScript。<br>在js中只<strong>有函数functions会新建</strong>一个新的作用域。在一个函数中定义的变量和内部函数在外部是无法获取的，同时也不会影响全局的变量。<br>js 作用域形成作用域链。标识符通过链，从低级往父级搜索。<br>实现上，通过在函数对象的[[scope]]属性指向父级的AO/VO对象。形成作用域链。<br>在js中，with可以改变作用域链，with对象可能从在prototype，所以<strong>标识符的搜索</strong>还包括prototype中搜索，形成两个维度的查找。<br><img src="/assert/scope.png"></p>
+<h2 id="变量生存周期">变量生存周期</h2><p>变量的生存周期，指的是变量存在的时间段。在绝大多数编程语言中，局部变量，在函数返回之后就回收，因为是在堆栈上。所以生存周期为一个函数内部调用期。<br>还有一类，我们称之为<strong>局部静态变量</strong>，说静态，是因为生存周期为整个程序运行期间。你都可以在可见范围内访问。<br>在JavaScript中，局部变量的生存周期是可以在函数返回之后保存，形成类似于局部静态变量。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">function extent () &#123;&#10;  var n = 0&#10;  return function () &#123;&#10;     n++ &#10;     console.log(n )&#10;  &#125;&#10;&#125;&#10;f = extent()&#10;f() // 1&#10;f() // 2</span><br></pre></td></tr></table></figure></p>
+<h2 id="闭包形成">闭包形成</h2><p>再来说闭包。有了上下文的概念和作用域链再来理解闭包。环境上下文封装了参数，内部函数，和局部变量。由于在函数内部可以定义函数，所以会出现一个场景：<br>外部函数执行完毕返回值为内部函数，这样内部函数仍然存在，而且内部函数的上下文也仍然存在，可以访问。同时，内部函数可以访问到外部函数的各种变量，称之为<strong>自由变量</strong>。<br>这种情况下，虽然外部函数返回，貌似参数和局部变量都应该GC，但是JavaScript中并没有，内部函数封闭了状态。这种情况我们称之为闭包。我们说<strong>闭包形成</strong>了。<br>封闭的原理，是当存在这种内部函数的时候，JavaScript在创建内部函数对象的时候，<strong>保存</strong>了scope chain，所以可以继续查找。<br>举例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">function foo() &#123;&#10;  var x = 10;&#10;  return function bar() &#123;&#10;    console.log(x);&#10;  &#125;;&#10;&#125;&#10;// &#34;foo&#34; returns also a function&#10;// and this returned function uses&#10;// free variable &#34;x&#34;&#10;&#10;var returnedFunction = foo();&#10;&#10;// global variable &#34;x&#34;&#10;var x = 20;&#10;&#10;// execution of the returned function&#10;returnedFunction(); // 10, but not 20</span><br></pre></td></tr></table></figure></p>
+<p>这种形式的作用域称为<strong>静态作用域[static/lexicalscope]</strong>。上面的x变量就是在函数bar的[[Scope]]中搜寻到的。<br>解决qsort 问题：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//&#35843;&#29992;&#20989;&#25968;&#10;func_a ()&#10;&#123;&#10;    int  i = 0; //&#23616;&#37096;&#21464;&#37327;&#10;        &#10;    var qsort = function (array,length,sizeof(int))//&#35843;&#29992;&#39640;&#38454;&#20989;&#25968;&#10;    &#123;&#10;        var res =  compare (const void*,const void*)&#10;        &#123;&#10;            //&#35775;&#38382;&#21464;&#37327;i&#10;            //&#25490;&#24207;&#10;        &#125;&#10;        return res&#10;    &#125;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="面向对象和闭包">面向对象和闭包</h2><p>可以看到，闭包通过另一种形式，实现了代码和数据的封装，这不正是面向对象的思想？<br>所以松本行弘认为<strong>闭包和面向对象是同一事物的正反面</strong>。<br>个人体会不深，道理是这么个道理，但是略牵强。毕竟闭包和面向对象有不同的语境。</p>
+<h2 id="闭包应用场景">闭包应用场景</h2><ul>
+<li>至于闭包的作用，暂时接触到的，就是封装局部变量，实现局部静态变量的效果。</li>
+<li>还可以实现变量的隐藏。通过返回的闭包来操作原变量，而原变量本身所在函数已经回收。闭包包括了对变量<strong>访问和修改</strong>的接口。举例(来自知乎用户)：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var foo = ( function() &#123;&#10;    var secret = &#39;secret&#39;;&#10;    // &#8220;&#38381;&#21253;&#8221;&#20869;&#30340;&#20989;&#25968;&#21487;&#20197;&#35775;&#38382; secret &#21464;&#37327;&#65292;&#32780; secret &#21464;&#37327;&#23545;&#20110;&#22806;&#37096;&#21364;&#26159;&#38544;&#34255;&#30340;&#10;    return &#123;&#10;        get_secret: function () &#123;&#10;            // &#36890;&#36807;&#23450;&#20041;&#30340;&#25509;&#21475;&#26469;&#35775;&#38382; secret&#10;            return secret;&#10;        &#125;,&#10;        new_secret: function ( new_secret ) &#123;&#10;            // &#36890;&#36807;&#23450;&#20041;&#30340;&#25509;&#21475;&#26469;&#20462;&#25913; secret&#10;            secret = new_secret;&#10;        &#125;&#10;    &#125;;&#10;    &#125; () );&#10;&#10;foo.get_secret (); // &#24471;&#21040; &#39;secret&#39;&#10;foo.secret; // Type error&#65292;&#35775;&#38382;&#19981;&#33021;&#10;foo.new_secret (&#39;a new secret&#39;); // &#36890;&#36807;&#20989;&#25968;&#25509;&#21475;&#65292;&#25105;&#20204;&#35775;&#38382;&#24182;&#20462;&#25913;&#20102; secret &#21464;&#37327;&#10;foo.get_secret (); // &#24471;&#21040; &#39;a new secret&#39;</span><br></pre></td></tr></table></figure></li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/javascript/">javascript</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/闭包/">闭包</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://github.com/neo-v/neo-v.github.io/2015-07-18/closure/" data-title="javascript 闭包的理解 | 最初的梦想" data-tsina="undefined" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015-07-16/algorithm-complexity/"  title="算法复杂度分析">
+ <strong>下一篇：</strong><br/> 
+ <span>算法复杂度分析
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#函数对象"><span class="toc-number">1.</span> <span class="toc-text">函数对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#高阶函数"><span class="toc-number">2.</span> <span class="toc-text">高阶函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#函数指针的局限"><span class="toc-number">3.</span> <span class="toc-text">函数指针的局限</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#上下文环境"><span class="toc-number">4.</span> <span class="toc-text">上下文环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JavaScript作用域"><span class="toc-number">5.</span> <span class="toc-text">JavaScript作用域</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#变量生存周期"><span class="toc-number">6.</span> <span class="toc-text">变量生存周期</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#闭包形成"><span class="toc-number">7.</span> <span class="toc-text">闭包形成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#面向对象和闭包"><span class="toc-number">8.</span> <span class="toc-text">面向对象和闭包</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#闭包应用场景"><span class="toc-number">9.</span> <span class="toc-text">闭包应用场景</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/javascript/" title="javascript">javascript<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/体系结构/" title="体系结构">体系结构<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/分布式系统/" title="分布式系统">分布式系统<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/助教/" title="助教">助教<sup>8</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/工程理论实践/" title="工程理论实践">工程理论实践<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/操作系统/" title="操作系统">操作系统<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/日志/" title="日志">日志<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法和数据结构/" title="算法和数据结构">算法和数据结构<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/编码/" title="编码">编码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/计算理论/" title="计算理论">计算理论<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/assistant，embed，Galileo/" title="assistant，embed，Galileo">assistant，embed，Galileo<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/assistant/" title="assistant">assistant<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/javascript/" title="javascript">javascript<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/life/" title="life">life<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/exec/" title="exec">exec<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/单例模式/" title="单例模式">单例模式<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/side-effect/" title="side-effect">side-effect<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pthread/" title="pthread">pthread<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/线程同步/" title="线程同步">线程同步<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/beauty-of-programming/" title="beauty of programming">beauty of programming<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/prototype/" title="prototype">prototype<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/oop/" title="oop">oop<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存，分布式，CDN/" title="缓存，分布式，CDN">缓存，分布式，CDN<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/process/" title="process">process<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fork/" title="fork">fork<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/journal/" title="journal">journal<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/软件开发/" title="软件开发">软件开发<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/linux-process/" title="linux,process">linux,process<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CONVERT-CAST/" title="CONVERT,CAST">CONVERT,CAST<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/闭包/" title="闭包">闭包<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="weiboshow">
+  <p class="asidetitle">我的微博</p>
+   <iframe width="100%" height="400" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=400&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=0&uid=2115828167&verifier=7b807bb3&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello,I&#39;m neo <br/>
+			nice to meet you</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/https://github.com/neo-v" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:pirloandkaka@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="https://github.com/neo-v/neo-v.github.io/about" target="_blank" title="Neo">Neo</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

@@ -1,0 +1,638 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>理解linux进程之线程同步 | 最初的梦想</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Neo">
+    
+
+    
+    <meta name="description" content="pthread线程库学习使用pthread中线程同步，有互斥锁，读写锁，条件变量，barrier和join机制。同步和互斥的关系，同步是限制执行的顺序，互斥可以认为是同步的一种。也可以认为是同步的一种实现机制。
+mutex使用mutex用来做互斥，即mutual excursion。对于一段临界区代码，同一时刻只能有一个线程在执行。一般使用mutex做互斥。接口如下：
+pthread_mutex_">
+<meta property="og:type" content="article">
+<meta property="og:title" content="理解linux进程之线程同步">
+<meta property="og:url" content="https://github.com/neo-v/neo-v.github.io/2015-07-07/pthread/index.html">
+<meta property="og:site_name" content="最初的梦想">
+<meta property="og:description" content="pthread线程库学习使用pthread中线程同步，有互斥锁，读写锁，条件变量，barrier和join机制。同步和互斥的关系，同步是限制执行的顺序，互斥可以认为是同步的一种。也可以认为是同步的一种实现机制。
+mutex使用mutex用来做互斥，即mutual excursion。对于一段临界区代码，同一时刻只能有一个线程在执行。一般使用mutex做互斥。接口如下：
+pthread_mutex_">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/convar.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/join_normal.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/join_1.png">
+<meta property="og:updated_time" content="2015-07-25T01:18:12.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="理解linux进程之线程同步">
+<meta name="twitter:description" content="pthread线程库学习使用pthread中线程同步，有互斥锁，读写锁，条件变量，barrier和join机制。同步和互斥的关系，同步是限制执行的顺序，互斥可以认为是同步的一种。也可以认为是同步的一种实现机制。
+mutex使用mutex用来做互斥，即mutual excursion。对于一段临界区代码，同一时刻只能有一个线程在执行。一般使用mutex做互斥。接口如下：
+pthread_mutex_">
+
+    
+    <link rel="alternative" href="/atom.xml" title="最初的梦想" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.png">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/pacman.png" alt="最初的梦想" title="最初的梦想"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="最初的梦想">最初的梦想</a></h1>
+				<h2 class="blog-motto">hello world！</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:github.com/neo-v/neo-v.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015-07-07/pthread/" title="理解linux进程之线程同步" itemprop="url">理解linux进程之线程同步</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="https://github.com/neo-v/neo-v.github.io/about" title="Neo" target="_blank" itemprop="author">Neo</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-07T15:20:26.000Z" itemprop="datePublished"> 发表于 Jul 7 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#pthread线程库学习使用"><span class="toc-number">1.</span> <span class="toc-text">pthread线程库学习使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#mutex使用"><span class="toc-number">1.1.</span> <span class="toc-text">mutex使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rw锁"><span class="toc-number">1.2.</span> <span class="toc-text">rw锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#spin锁"><span class="toc-number">1.3.</span> <span class="toc-text">spin锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#条件变量"><span class="toc-number">1.4.</span> <span class="toc-text">条件变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#join机制"><span class="toc-number">1.5.</span> <span class="toc-text">join机制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Barriers_机制"><span class="toc-number">1.6.</span> <span class="toc-text">Barriers 机制</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h2 id="pthread线程库学习使用">pthread线程库学习使用</h2><p>pthread中线程同步，有互斥锁，读写锁，条件变量，barrier和join机制。同步和互斥的关系，同步是限制执行的顺序，互斥可以认为是同步的一种。也可以认为是同步的一种实现机制。</p>
+<h3 id="mutex使用">mutex使用</h3><p>mutex用来做互斥，即mutual excursion。对于一段临界区代码，同一时刻只能有一个线程在执行。一般使用mutex做互斥。接口如下：</p>
+<pre><code>pthread_mutex_init <span class="list">(<span class="keyword">mutex</span>,attr)</span>
+pthread_mutex_destroy <span class="list">(<span class="keyword">mutex</span>)</span>
+pthread_mutexattr_init <span class="list">(<span class="keyword">attr</span>)</span>
+pthread_mutexattr_destroy <span class="list">(<span class="keyword">attr</span>)</span>
+</code></pre><p>使用上述接口创建和撤销互斥量。使用如下接口对互斥量进行锁定：</p>
+<pre><code>pthread_mutex_lock <span class="list">(<span class="keyword">mutex</span>)</span>
+pthread_mutex_trylock <span class="list">(<span class="keyword">mutex</span>)</span>
+pthread_mutex_unlock <span class="list">(<span class="keyword">mutex</span>)</span>
+</code></pre><p>举个例子，我们要对共享的变量做加法：</p>
+<pre><code>pthread_mutex_lock (&amp;mutexsum)<span class="comment">;</span>
+dotstr.sum += mysum<span class="comment">;</span>
+pthread_mutex_unlock (&amp;mutexsum)<span class="comment">;</span>
+</code></pre><p>可以保证sum在同一时间，只有一个线程对其进行修改。<br><strong>使用mutex的注意事项</strong>:<br>在需要多个锁的场景中，要预防<strong>死锁</strong>。死锁有四个必要条件：</p>
+<ol>
+<li>互斥使用</li>
+<li>不可剥夺资源</li>
+<li>请求和保持</li>
+<li>循环等待。<br>多个mutex使用不当，可能造成死锁。所以破除的一个方法，是破坏死锁的一个必要条件，通常。我们的做法，是对资源进行按序加锁，以避免形成循环等待。</li>
+</ol>
+<h3 id="rw锁">rw锁</h3><p>互斥锁粒度比较大，而且锁定之后，阻塞其他所有进程。有些场景，比如读写，读并不修改数据，这个时候读其实是可以并发的。所以有了RW锁。接口如下：</p>
+<pre><code>pthread_rwlock_destroy 
+pthread_rwlock_init 
+pthread_rwlock_rdlock 
+<span class="keyword">pthread_rwlock_t</span>ryrdlock 
+<span class="keyword">pthread_rwlock_t</span>rywrlock 
+pthread_rwlock_unlock 
+pthread_rwlock_wrlock 
+pthread_rwlockattr_destroy 
+pthread_rwlockattr_getpshared 
+pthread_rwlockattr_init 
+pthread_rwlockattr_setpshared 
+</code></pre><p>读写锁，特点是写锁互斥，读锁之间可重复使用。提高了效率。<br>使用读写锁要注意避免<strong>线程饥饿</strong>。应为读和写互斥，若读优先，写锁可能一直无法加锁。导致饥饿。若写优先，也能导致读线程饥饿。<br>一般场景下，读多余写。我们一般设置写优先级比较高。使用<strong>PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP</strong>。</p>
+<h3 id="spin锁">spin锁</h3><p>这里说一下，spin锁，他是前面两个锁的基础。可以看一下它的实现：</p>
+<pre><code><span class="keyword">int</span> _pthread_spin_lock (<span class="keyword">__pthread_spinlock_t</span> *lock)
+{
+  <span class="keyword">int</span> i;
+  <span class="keyword">while</span> (<span class="number">1</span>)
+    {
+      <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; __pthread_spin_count; i++)
+    {
+      <span class="keyword">if</span> (<span class="keyword">__pthread_spin_t</span>rylock (lock) == <span class="number">0</span>)
+        <span class="keyword">return</span> <span class="number">0</span>;
+    }
+      __sched_yield ();
+    }
+}
+</code></pre><p>先尝试加锁一段时间，若不成功，挂起。道理很好理解。是对上下文切换带来的消耗和轮询带来消耗的一个这种策略。</p>
+<h3 id="条件变量">条件变量</h3><p>条件变量是另一种同步机制，使用不同的场景。条件变量的意思是，用来表示线程间，满足某一条件的同步关系。举个例子：</p>
+<pre><code>pthread_mutex_lock<span class="params">(&amp;count_mutex)</span>;
+ while <span class="params">(count&lt;COUNT_LIMIT)</span> {
+   pthread_cond_wait<span class="params">(&amp;count_threshold_cv, &amp;count_mutex)</span>;
+   printf<span class="params">(<span class="string">"watch_count(): thread %ld Condition signal received.\n"</span>, my_id)</span>;
+   count += <span class="number">125</span>;
+   printf<span class="params">(<span class="string">"watch_count(): thread %ld count now = %d.\n"</span>, my_id, count)</span>;
+   }
+ pthread_mutex_unlock<span class="params">(&amp;count_mutex)</span>;
+</code></pre><p>在count 没有到达LIMIT之前，线程阻塞等待。与轮询的差别在于，wait()的线程会被主动唤醒。减少cpu轮询的资源消耗。<br>该实例运行结果如下：<br><img src="/assert/convar.png"><br><strong>使用接口:</strong></p>
+<pre><code>pthread_cond_init <span class="list">(<span class="keyword">condition</span>,attr)</span>
+pthread_cond_destroy <span class="list">(<span class="keyword">condition</span>)</span>
+pthread_condattr_init <span class="list">(<span class="keyword">attr</span>)</span>
+pthread_condattr_destroy <span class="list">(<span class="keyword">attr</span>)</span>
+pthread_cond_wait <span class="list">(<span class="keyword">condition</span>,mutex)</span>
+pthread_cond_signal <span class="list">(<span class="keyword">condition</span>)</span>
+pthread_cond_broadcast <span class="list">(<span class="keyword">condition</span>)</span>
+</code></pre><p><strong>使用注意事项</strong>：</p>
+<ol>
+<li>配合mutex使用，条件变量的查询需要加锁。条件检测while和wait()之间不能留有调度的缝隙，避免变量修改。</li>
+<li>检测使用while，而不是if。多判断一次目标值，防止意外更改一次。</li>
+</ol>
+<h3 id="join机制">join机制</h3><p>join机制，适用于另一种同步的场景，即等待其他线程结束。terminate。接口如下：</p>
+<pre><code>pthread_join <span class="list">(<span class="keyword">threadid</span>,status)</span>
+</code></pre><p>用法比较简单，被join的线程，必须是joinable的。通过设置线程的attr。</p>
+<pre><code>pthread_attr_init<span class="list">(<span class="keyword">&amp;attr</span>)</span><span class="comment">;</span>
+pthread_attr_setdetachstate<span class="list">(<span class="keyword">&amp;attr</span>, PTHREAD_CREATE_JOINABLE)</span><span class="comment">;     pthread_attr_destroy(&amp;attr);</span>
+   for<span class="list">(<span class="keyword">t=0</span><span class="comment">; t&lt;NUM_THREADS; t++) {</span>
+      rc = pthread_join<span class="list">(<span class="keyword">thread</span>[<span class="literal">t</span>], <span class="keyword">&amp;status</span>)</span><span class="comment">;</span>
+      if <span class="list">(<span class="keyword">rc</span>)</span> {
+         printf<span class="list">(<span class="string">"ERROR; return code from pthread_join() 
+                is %d\n"</span>, rc)</span><span class="comment">;</span>
+         exit<span class="list">(<span class="keyword">-1</span>)</span><span class="comment">;</span>
+         }
+      printf<span class="list">(<span class="string">"Main: completed join with thread %ld having a status   
+            of %ld\n"</span>,<span class="literal">t</span>,<span class="list">(<span class="keyword">long</span>)</span>status)</span><span class="comment">;</span>
+      }
+printf<span class="list">(<span class="string">"Main: program completed. Exiting.\n"</span>)</span><span class="comment">;</span></span>
+</code></pre><p><strong>使用join()的注意事项</strong>：</p>
+<ol>
+<li>join的线程确保在运行中</li>
+<li>join的线程，不能被多次join()。可以同时join。示例：<img src="/assert/join_normal.png">
+<img src="/assert/join_1.png">
+</li>
+</ol>
+<h3 id="Barriers_机制">Barriers 机制</h3><p>类似条件变量。表示线程阻塞在某一时刻。等待其他线程达到同样的状态。比如归并排序，等待所有线程归并一次，再开始下一次。接口入下：</p>
+<pre><code><span class="function"><span class="keyword">int</span> <span class="title">pthread_barrier_init</span><span class="params">(pthread_barrier_t *barrier, <span class="keyword">const</span>      pthread_barrierattr_t *<span class="keyword">restrict</span> attr, <span class="keyword">unsigned</span> count)</span></span>;
+<span class="function"><span class="keyword">int</span> <span class="title">pthread_barrier_destroy</span><span class="params">(pthread_barrier_t *barrier)</span></span>;
+<span class="function"><span class="keyword">int</span> <span class="title">pthread_barrier_wait</span><span class="params">(pthread_barrier_t *barrier)</span></span>;
+</code></pre>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/操作系统/">操作系统</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/pthread/">pthread</a><a href="/tags/线程同步/">线程同步</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://github.com/neo-v/neo-v.github.io/2015-07-07/pthread/" data-title="理解linux进程之线程同步 | 最初的梦想" data-tsina="undefined" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015-07-08/address/" title="x86 地址的理解">
+  <strong>上一篇：</strong><br/>
+  <span>
+  x86 地址的理解</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015-06-29/website-evolution/"  title="大型网站架构演进的思考">
+ <strong>下一篇：</strong><br/> 
+ <span>大型网站架构演进的思考
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#pthread线程库学习使用"><span class="toc-number">1.</span> <span class="toc-text">pthread线程库学习使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#mutex使用"><span class="toc-number">1.1.</span> <span class="toc-text">mutex使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rw锁"><span class="toc-number">1.2.</span> <span class="toc-text">rw锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#spin锁"><span class="toc-number">1.3.</span> <span class="toc-text">spin锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#条件变量"><span class="toc-number">1.4.</span> <span class="toc-text">条件变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#join机制"><span class="toc-number">1.5.</span> <span class="toc-text">join机制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Barriers_机制"><span class="toc-number">1.6.</span> <span class="toc-text">Barriers 机制</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/javascript/" title="javascript">javascript<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/体系结构/" title="体系结构">体系结构<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/分布式系统/" title="分布式系统">分布式系统<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/助教/" title="助教">助教<sup>8</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/工程理论实践/" title="工程理论实践">工程理论实践<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/操作系统/" title="操作系统">操作系统<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/日志/" title="日志">日志<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法和数据结构/" title="算法和数据结构">算法和数据结构<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/编码/" title="编码">编码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/计算理论/" title="计算理论">计算理论<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/assistant，embed，Galileo/" title="assistant，embed，Galileo">assistant，embed，Galileo<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/assistant/" title="assistant">assistant<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/javascript/" title="javascript">javascript<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/life/" title="life">life<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/exec/" title="exec">exec<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/单例模式/" title="单例模式">单例模式<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/side-effect/" title="side-effect">side-effect<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pthread/" title="pthread">pthread<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/线程同步/" title="线程同步">线程同步<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/beauty-of-programming/" title="beauty of programming">beauty of programming<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/prototype/" title="prototype">prototype<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/oop/" title="oop">oop<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存，分布式，CDN/" title="缓存，分布式，CDN">缓存，分布式，CDN<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/process/" title="process">process<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fork/" title="fork">fork<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/journal/" title="journal">journal<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/软件开发/" title="软件开发">软件开发<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/linux-process/" title="linux,process">linux,process<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CONVERT-CAST/" title="CONVERT,CAST">CONVERT,CAST<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/闭包/" title="闭包">闭包<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="weiboshow">
+  <p class="asidetitle">我的微博</p>
+   <iframe width="100%" height="400" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=400&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=0&uid=2115828167&verifier=7b807bb3&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello,I&#39;m neo <br/>
+			nice to meet you</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/https://github.com/neo-v" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:pirloandkaka@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="https://github.com/neo-v/neo-v.github.io/about" target="_blank" title="Neo">Neo</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
