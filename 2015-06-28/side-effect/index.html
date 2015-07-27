@@ -4,29 +4,23 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>表达式的副作用 | 最初的梦想</title>
+    <title>����ʽ�ĸ����� | 最初的梦想</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Neo">
     
 
     
-    <meta name="description" content="表达式，expression，在各种编程语言中这个术语很常见，可以理解为一段计算，或者说对变量求值。如x*2+3。编程语言中的表达式可以说分为两种，有副作用(side-effect)和没有副作用的。所谓副作用，就是表达式在求值的过程过中，改变了参与的变量的值。最常见的比如赋值表达式：x = 2 x的值改变为2。如何判断表达式是否有副作用：
-
-通过辨认表达式中包含的相关类似赋值的操作符。比如 =，+">
+    <meta name="description" content="����ʽ��expression���ڸ��ֱ������������������ܳ�������������Ϊһ�μ��㣬����˵�Ա�����ֵ����x*2+3�����������еı���ʽ����˵��Ϊ���֣��и�����(side-effect)��û�и����õġ���ν�����������Ǳ���ʽ����ֵ�Ĺ��̹��У��ı��˲����ı�����ֵ���">
 <meta property="og:type" content="article">
-<meta property="og:title" content="表达式的副作用">
+<meta property="og:title" content="����ʽ�ĸ�����">
 <meta property="og:url" content="https://github.com/neo-v/neo-v.github.io/2015-06-28/side-effect/index.html">
 <meta property="og:site_name" content="最初的梦想">
-<meta property="og:description" content="表达式，expression，在各种编程语言中这个术语很常见，可以理解为一段计算，或者说对变量求值。如x*2+3。编程语言中的表达式可以说分为两种，有副作用(side-effect)和没有副作用的。所谓副作用，就是表达式在求值的过程过中，改变了参与的变量的值。最常见的比如赋值表达式：x = 2 x的值改变为2。如何判断表达式是否有副作用：
-
-通过辨认表达式中包含的相关类似赋值的操作符。比如 =，+">
-<meta property="og:updated_time" content="2015-07-27T15:09:09.000Z">
+<meta property="og:description" content="����ʽ��expression���ڸ��ֱ������������������ܳ�������������Ϊһ�μ��㣬����˵�Ա�����ֵ����x*2+3�����������еı���ʽ����˵��Ϊ���֣��и�����(side-effect)��û�и����õġ���ν�����������Ǳ���ʽ����ֵ�Ĺ��̹��У��ı��˲����ı�����ֵ���">
+<meta property="og:updated_time" content="2015-07-27T15:10:58.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="表达式的副作用">
-<meta name="twitter:description" content="表达式，expression，在各种编程语言中这个术语很常见，可以理解为一段计算，或者说对变量求值。如x*2+3。编程语言中的表达式可以说分为两种，有副作用(side-effect)和没有副作用的。所谓副作用，就是表达式在求值的过程过中，改变了参与的变量的值。最常见的比如赋值表达式：x = 2 x的值改变为2。如何判断表达式是否有副作用：
-
-通过辨认表达式中包含的相关类似赋值的操作符。比如 =，+">
+<meta name="twitter:title" content="����ʽ�ĸ�����">
+<meta name="twitter:description" content="����ʽ��expression���ڸ��ֱ������������������ܳ�������������Ϊһ�μ��㣬����˵�Ա�����ֵ����x*2+3�����������еı���ʽ����˵��Ϊ���֣��и�����(side-effect)��û�и����õġ���ν�����������Ǳ���ʽ����ֵ�Ĺ��̹��У��ı��˲����ı�����ֵ���">
 
     
     <link rel="alternative" href="/atom.xml" title="最初的梦想" type="application/atom+xml">
@@ -86,7 +80,7 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015-06-28/side-effect/" title="表达式的副作用" itemprop="url">表达式的副作用</a>
+      <a href="/2015-06-28/side-effect/" title="����ʽ�ĸ�����" itemprop="url">����ʽ�ĸ�����</a>
   </h1>
   <p class="article-author">By
        
@@ -106,17 +100,17 @@
 		
 		</div>
 		
-		<p><strong>表达式</strong>，expression，在各种编程语言中这个术语很常见，可以理解为一段计算，或者说对变量<strong>求值</strong>。如<strong>x*2+3</strong>。<br>编程语言中的表达式可以说分为两种，有副作用(side-effect)和没有副作用的。<br><strong>所谓副作用</strong>，就是表达式在求值的过程过中，改变了参与的变量的值。最常见的比如赋值表达式：x = 2 x的值改变为2。<br><strong>如何判断</strong>表达式是否有副作用：</p>
+		<p><strong>����ʽ</strong>��expression���ڸ��ֱ������������������ܳ�������������Ϊһ�μ��㣬����˵�Ա���<strong>��ֵ</strong>����<strong>x*2+3</strong>��<br>���������еı���ʽ����˵��Ϊ���֣��и�����(side-effect)��û�и����õġ�<br><strong>��ν������</strong>�����Ǳ���ʽ����ֵ�Ĺ��̹��У��ı��˲����ı�����ֵ������ı��縳ֵ����ʽ��x = 2 x��ֵ�ı�Ϊ2��<br><strong>�����ж�</strong>����ʽ�Ƿ��и����ã�</p>
 <ol>
-<li>通过辨认表达式中包含的相关类似赋值的操作符。比如 =，+=，++，—等</li>
-<li>含有副作用的表达式，求值顺序不能改变。比如：X = 2的时候，++X ，X+4，分别求得为3，7。改变顺序，X+4，++X，分别求得6和3。</li>
+<li>ͨ�����ϱ���ʽ�а������������Ƹ�ֵ�Ĳ����������� =��+=��++��—��</li>
+<li>���и����õı���ʽ����ֵ˳�����ܸı䡣���磺X = 2��ʱ����++X ��X+4���ֱ�����Ϊ3��7���ı�˳����X+4��++X���ֱ�����6��3��</li>
 </ol>
-<p>表达式副作用的<strong>应用</strong>：<br>在很多高级语言，比如c++和java，都支持有副作用的表达式。具体的应用表现在：</p>
+<p>����ʽ�����õ�<strong>Ӧ��</strong>��<br>�ںܶ��߼����ԣ�����c++��java����֧���и����õı���ʽ��������Ӧ�ñ����ڣ�</p>
 <ol>
-<li>逗号表达式，逗号表达式的返回最后一个表达式的求值。所以它前边的表达式要有副作用，整个表达式才有意义。</li>
-<li>语句，c++中表达式加上‘；’构成了语句。我们一般都是每次书写一条语句。比如 x = x + 2； 作用就是 将x的值改变。而表达式本身的求值舍弃。所以没有副作用的语句是没有意义的。</li>
+<li>���ű���ʽ�����ű���ʽ�ķ�������һ������ʽ����ֵ��������ǰ�ߵı���ʽҪ�и����ã���������ʽ�������塣</li>
+<li>���䣬c++�б���ʽ���ϡ��������������䡣����һ�㶼��ÿ����дһ�����䡣���� x = x + 2�� ���þ��� ��x��ֵ�ı䡣������ʽ��������ֵ����������û�и����õ�������û�������ġ�</li>
 </ol>
-<p>c和c++中有<strong>序列点</strong>的概念。两个序列点之间的求值顺序是任意的。一个语句‘；’就是一个序列点。所以一条表达式语句，<strong>最好不要有多个有副作用的子表达式</strong>，不然会产生难以捉摸的代码。比如：<br>b = (a++) + (a++) + (++a),可读性太差。由于求值顺序是任意的，先计算++a和后计算++a，表达式的值是不一样的。</p>
+<p>c��c++����<strong>���е�</strong>�ĸ���������е�֮������ֵ˳���������ġ�һ�����䡮��������һ�����е㡣����һ������ʽ���䣬<strong>���ò�Ҫ�ж����и����õ��ӱ���ʽ</strong>����Ȼ����������׽���Ĵ��롣���磺<br>b = (a++) + (a++) + (++a),�ɶ���̫�������ֵ˳���������ģ��ȼ���++a�ͺ�����++a������ʽ��ֵ�ǲ�һ���ġ�</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -124,7 +118,7 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/编程语言和理论/">编程语言和理论</a>
+  <a class="article-category-link" href="/categories/�������Ժ�����/">�������Ժ�����</a>
 </div>
 
 
@@ -139,7 +133,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="https://github.com/neo-v/neo-v.github.io/2015-06-28/side-effect/" data-title="表达式的副作用 | 最初的梦想" data-tsina="undefined" class="share clearfix">
+	  <div data-url="https://github.com/neo-v/neo-v.github.io/2015-06-28/side-effect/" data-title="����ʽ�ĸ����� | 最初的梦想" data-tsina="undefined" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -233,13 +227,17 @@
 		  
 		
 		  
-			<li><a href="/categories/javascript/编程语言和理论/" title="编程语言和理论">编程语言和理论<sup>1</sup></a></li>
+		
 		  
 		
 		  
-			<li><a href="/categories/编程语言和理论/" title="编程语言和理论">编程语言和理论<sup>1</sup></a></li>
+		
+		  
+			<li><a href="/categories/�������Ժ�����/" title="�������Ժ�����">�������Ժ�����<sup>1</sup></a></li>
 		  
 		
+		  
+			<li><a href="/categories/javascript/�������Ժ�����/" title="�������Ժ�����">�������Ժ�����<sup>1</sup></a></li>
 		  
 		
 		</ul>
@@ -268,7 +266,7 @@
 			
 		
 			
-				<li><a href="/tags/exec/" title="exec">exec<sup>1</sup></a></li>
+				<li><a href="/tags/软件开发/" title="软件开发">软件开发<sup>1</sup></a></li>
 			
 		
 			
@@ -312,11 +310,11 @@
 			
 		
 			
-				<li><a href="/tags/journal/" title="journal">journal<sup>1</sup></a></li>
+				<li><a href="/tags/exec/" title="exec">exec<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/软件开发/" title="软件开发">软件开发<sup>1</sup></a></li>
+				<li><a href="/tags/journal/" title="journal">journal<sup>1</sup></a></li>
 			
 		
 			
@@ -328,7 +326,7 @@
 			
 		
 			
-				<li><a href="/tags/闭包/" title="闭包">闭包<sup>1</sup></a></li>
+				<li><a href="/tags/GC/" title="GC">GC<sup>1</sup></a></li>
 			
 		
 		</ul>
