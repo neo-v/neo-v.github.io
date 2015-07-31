@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="最初的梦想">
 <meta property="og:description" content="算法复杂度用来衡量算法的运行效率。这里学习了下大O表示法，也叫渐近复杂度。
 概念这种方法用代码执行过程中，运行语句的最高频度的阶，来衡量算法的效果。对于给定的输入规模n，求得一个关于n的函数，然后将最高阶(忽略低阶，常数和最高阶的系数)，记作复杂度。举个例子：输入规模：n示例算法：计算前n项自然数的和。f(n) = n + (n-1) + … + 1最高频度：运行加法n-1次，记作T(n) = n">
-<meta property="og:updated_time" content="2015-07-25T01:18:12.000Z">
+<meta property="og:updated_time" content="2015-07-31T16:25:50.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="算法复杂度分析">
 <meta name="twitter:description" content="算法复杂度用来衡量算法的运行效率。这里学习了下大O表示法，也叫渐近复杂度。
@@ -99,7 +99,7 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概念"><span class="toc-number">1.</span> <span class="toc-text">概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#计算规则"><span class="toc-number">2.</span> <span class="toc-text">计算规则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#循环复杂度"><span class="toc-number">3.</span> <span class="toc-text">循环复杂度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#递归复杂度"><span class="toc-number">4.</span> <span class="toc-text">递归复杂度</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概念"><span class="toc-number">1.</span> <span class="toc-text">概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#计算规则"><span class="toc-number">2.</span> <span class="toc-text">计算规则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#循环复杂度"><span class="toc-number">3.</span> <span class="toc-text">循环复杂度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#递归复杂度"><span class="toc-number">4.</span> <span class="toc-text">递归复杂度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常见应用："><span class="toc-number">5.</span> <span class="toc-text">常见应用：</span></a></li></ol>
 		
 		</div>
 		
@@ -128,7 +128,10 @@
 </ol>
 </li>
 </ul>
-<p><strong>参见链接</strong><br><a href="http://www.csd.uwo.ca/~moreno//CS424/Ressources/master.pdf" target="_blank" rel="external">http://www.csd.uwo.ca/~moreno//CS424/Ressources/master.pdf</a></p>
+<h2 id="常见应用：">常见应用：</h2><pre><code><span class="number">1</span>. 二分搜索 <span class="function"><span class="title">T</span><span class="params">(n)</span></span> = <span class="function"><span class="title">T</span><span class="params">(n/<span class="number">2</span>)</span></span> + <span class="function"><span class="title">O</span><span class="params">(<span class="number">1</span>)</span></span> ==&gt; <span class="function"><span class="title">O</span><span class="params">(logn)</span></span>
+<span class="number">2</span>. 快排 <span class="function"><span class="title">T</span><span class="params">(n)</span></span> = <span class="number">2</span>T(n/<span class="number">2</span>) + <span class="function"><span class="title">O</span><span class="params">(n)</span></span> ==&gt; <span class="function"><span class="title">O</span><span class="params">(nlogn)</span></span>
+<span class="number">3</span>. 快排最差：<span class="function"><span class="title">T</span><span class="params">(n)</span></span> = <span class="function"><span class="title">T</span><span class="params">(n-<span class="number">1</span>)</span></span> + <span class="function"><span class="title">T</span><span class="params">(n)</span></span> + <span class="function"><span class="title">O</span><span class="params">(n)</span></span> ==&gt; <span class="function"><span class="title">O</span><span class="params">(n^<span class="number">2</span>)</span></span>
+</code></pre><p><strong>参见链接</strong><br><a href="http://www.csd.uwo.ca/~moreno//CS424/Ressources/master.pdf" target="_blank" rel="external">http://www.csd.uwo.ca/~moreno//CS424/Ressources/master.pdf</a></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -191,7 +194,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概念"><span class="toc-number">1.</span> <span class="toc-text">概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#计算规则"><span class="toc-number">2.</span> <span class="toc-text">计算规则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#循环复杂度"><span class="toc-number">3.</span> <span class="toc-text">循环复杂度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#递归复杂度"><span class="toc-number">4.</span> <span class="toc-text">递归复杂度</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概念"><span class="toc-number">1.</span> <span class="toc-text">概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#计算规则"><span class="toc-number">2.</span> <span class="toc-text">计算规则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#循环复杂度"><span class="toc-number">3.</span> <span class="toc-text">循环复杂度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#递归复杂度"><span class="toc-number">4.</span> <span class="toc-text">递归复杂度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常见应用："><span class="toc-number">5.</span> <span class="toc-text">常见应用：</span></a></li></ol>
  
   </div>
 
