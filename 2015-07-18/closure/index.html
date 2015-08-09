@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>javascript 闭包的理解 | 最初的梦想</title>
+    <title>JavaScript 闭包,作用域的理解 | 最初的梦想</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Neo">
@@ -13,15 +13,15 @@
     
     <meta name="description" content="JavaScript 闭包的理解。闭包在编程语言中出现的很灵活，不只有JavaScript中有，只是在JavaScript中明确有闭包的概念，在学习了相关知识后，可以发现闭包在编程语言是个很重要的特征，不只是简单的语法糖。学习闭包加深对编程语言理论中关于变量作用域，生存周期，垃圾回收的理解。参考自博文http://jibbering.com/faq/notes/closures/和松本行弘的书《代">
 <meta property="og:type" content="article">
-<meta property="og:title" content="javascript 闭包的理解">
+<meta property="og:title" content="JavaScript 闭包,作用域的理解">
 <meta property="og:url" content="https://github.com/neo-v/neo-v.github.io/2015-07-18/closure/index.html">
 <meta property="og:site_name" content="最初的梦想">
 <meta property="og:description" content="JavaScript 闭包的理解。闭包在编程语言中出现的很灵活，不只有JavaScript中有，只是在JavaScript中明确有闭包的概念，在学习了相关知识后，可以发现闭包在编程语言是个很重要的特征，不只是简单的语法糖。学习闭包加深对编程语言理论中关于变量作用域，生存周期，垃圾回收的理解。参考自博文http://jibbering.com/faq/notes/closures/和松本行弘的书《代">
 <meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/ce.png">
 <meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/scope.png">
-<meta property="og:updated_time" content="2015-08-09T14:52:42.000Z">
+<meta property="og:updated_time" content="2015-08-09T14:56:36.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="javascript 闭包的理解">
+<meta name="twitter:title" content="JavaScript 闭包,作用域的理解">
 <meta name="twitter:description" content="JavaScript 闭包的理解。闭包在编程语言中出现的很灵活，不只有JavaScript中有，只是在JavaScript中明确有闭包的概念，在学习了相关知识后，可以发现闭包在编程语言是个很重要的特征，不只是简单的语法糖。学习闭包加深对编程语言理论中关于变量作用域，生存周期，垃圾回收的理解。参考自博文http://jibbering.com/faq/notes/closures/和松本行弘的书《代">
 
     
@@ -82,7 +82,7 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015-07-18/closure/" title="javascript 闭包的理解" itemprop="url">javascript 闭包的理解</a>
+      <a href="/2015-07-18/closure/" title="JavaScript 闭包,作用域的理解" itemprop="url">JavaScript 闭包,作用域的理解</a>
   </h1>
   <p class="article-author">By
        
@@ -152,7 +152,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="https://github.com/neo-v/neo-v.github.io/2015-07-18/closure/" data-title="javascript 闭包的理解 | 最初的梦想" data-tsina="undefined" class="share clearfix">
+	  <div data-url="https://github.com/neo-v/neo-v.github.io/2015-07-18/closure/" data-title="JavaScript 闭包,作用域的理解 | 最初的梦想" data-tsina="undefined" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -166,10 +166,10 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2015-08-09/python_point/" title="">
+ <a href="/2015-08-09/Python-point/" title="Python_point">
   <strong>上一篇：</strong><br/>
   <span>
-  (no title)</span>
+  Python_point</span>
 </a>
 </div>
 
@@ -204,16 +204,6 @@
 <div class="categorieslist">
 	<p class="asidetitle">分类</p>
 		<ul>
-		
-		  
-		
-		  
-		
-		  
-		
-		  
-		
-		  
 		
 		  
 			<li><a href="/categories/体系结构/" title="体系结构">体系结构<sup>1</sup></a></li>
@@ -252,17 +242,7 @@
 		  
 		
 		  
-			<li><a href="/categories/编程语言和理论/" title="编程语言和理论">编程语言和理论<sup>4</sup></a></li>
-		  
-		
-		  
-		
-		  
-		
-		  
-		
-		  
-		
+			<li><a href="/categories/编程语言和理论/" title="编程语言和理论">编程语言和理论<sup>5</sup></a></li>
 		  
 		
 		</ul>
@@ -291,11 +271,7 @@
 			
 		
 			
-				<li><a href="/tags/软件开发/" title="软件开发">软件开发<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/单例模式/" title="单例模式">单例模式<sup>1</sup></a></li>
+				<li><a href="/tags/linux-process/" title="linux,process">linux,process<sup>1</sup></a></li>
 			
 		
 			
@@ -323,7 +299,7 @@
 			
 		
 			
-				<li><a href="/tags/缓存，分布式，CDN/" title="缓存，分布式，CDN">缓存，分布式，CDN<sup>1</sup></a></li>
+				<li><a href="/tags/事务/" title="事务">事务<sup>1</sup></a></li>
 			
 		
 			
@@ -339,11 +315,15 @@
 			
 		
 			
-				<li><a href="/tags/journal/" title="journal">journal<sup>1</sup></a></li>
+				<li><a href="/tags/软件开发/" title="软件开发">软件开发<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/linux-process/" title="linux,process">linux,process<sup>1</sup></a></li>
+				<li><a href="/tags/缓存，分布式，CDN/" title="缓存，分布式，CDN">缓存，分布式，CDN<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/journal/" title="journal">journal<sup>1</sup></a></li>
 			
 		
 			
