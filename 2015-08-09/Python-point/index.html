@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="最初的梦想">
 <meta property="og:description" content="Python编程要点拾遗。
 参数传递做leetcode发现，Python在参数传递，是传值还是传   地址的不同，不同于c/c++有指针，Python的传递看起来不是很直接。翻了资料发现，Python数据类型是分可变和不可变的。对于不可变的数据类型，比如整数，是copy的。对于可变的，比如list，是传地址的，或者说引用吧。所以说兼具了传值和传地址。在使用的时候，就需要注意。如果需要传递copy，">
-<meta property="og:updated_time" content="2015-08-10T07:40:11.000Z">
+<meta property="og:updated_time" content="2015-08-10T07:40:59.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Python_point">
 <meta name="twitter:description" content="Python编程要点拾遗。
@@ -177,10 +177,9 @@ filtered_and_squared = [ x**<span class="number">2</span> <span class="keyword">
 <pre><code><span class="keyword">if</span> x <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>：
 </code></pre></li>
 <li><p>命名空间和作用域<br>Python 有四个作用域，分别为：<br>local，enclose，global，built_in。符号解析的时候，依次搜索。找不到会抛出NameError异常，只有<strong>模块，类，和函数</strong>会引入新的作用域。<br>作用域是可以<strong>嵌套的</strong>，内层赋值语句会引入新的变量，有可能覆盖全局的变量。所以不推荐：</p>
-<p>   from a_module import * </p>
+<p>   from a_module import *<br>导入变量有可能被覆盖。</p>
 </li>
 </ol>
-<p>导入变量有可能被覆盖。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
