@@ -11,16 +11,19 @@
     
 
     
-    <meta name="description" content="my blog">
+    <meta name="description" content="Python编程要点拾遗。
+参数传递做leetcode发现，Python在参数传递，是传值还是传   地址的不同，不同于c/c++有指针，Python的传递看起来不是很直接。翻了资料发现，Python数据类型是分可变和不可变的。对于不可变的数据类型，比如整数，是copy的。对于可变的，比如list，是传地址的，或者说引用吧。所以说兼具了传值和传地址。在使用的时候，就需要注意。如果需要传递copy，">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Python_point">
 <meta property="og:url" content="https://github.com/neo-v/neo-v.github.io/2015-08-09/Python-point/index.html">
 <meta property="og:site_name" content="最初的梦想">
-<meta property="og:description" content="my blog">
-<meta property="og:updated_time" content="2015-08-09T15:05:01.000Z">
+<meta property="og:description" content="Python编程要点拾遗。
+参数传递做leetcode发现，Python在参数传递，是传值还是传   地址的不同，不同于c/c++有指针，Python的传递看起来不是很直接。翻了资料发现，Python数据类型是分可变和不可变的。对于不可变的数据类型，比如整数，是copy的。对于可变的，比如list，是传地址的，或者说引用吧。所以说兼具了传值和传地址。在使用的时候，就需要注意。如果需要传递copy，">
+<meta property="og:updated_time" content="2015-08-10T07:38:29.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Python_point">
-<meta name="twitter:description" content="my blog">
+<meta name="twitter:description" content="Python编程要点拾遗。
+参数传递做leetcode发现，Python在参数传递，是传值还是传   地址的不同，不同于c/c++有指针，Python的传递看起来不是很直接。翻了资料发现，Python数据类型是分可变和不可变的。对于不可变的数据类型，比如整数，是copy的。对于可变的，比如list，是传地址的，或者说引用吧。所以说兼具了传值和传地址。在使用的时候，就需要注意。如果需要传递copy，">
 
     
     <link rel="alternative" href="/atom.xml" title="最初的梦想" type="application/atom+xml">
@@ -96,11 +99,88 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Python编程要点拾遗。"><span class="toc-number">1.</span> <span class="toc-text">Python编程要点拾遗。</span></a></li></ol>
 		
 		</div>
 		
-		  
+		<h2 id="Python编程要点拾遗。">Python编程要点拾遗。</h2><ol>
+<li><p>参数传递<br>做leetcode发现，Python在参数传递，是传值还是传   地址的不同，不同于c/c++有指针，Python的传递看起来不是很直接。<br>翻了资料发现，Python数据类型是<strong>分可变和不可变</strong>的。对于不可变的数据类型，比如整数，是copy的。对于可变的，比如list，是传地址的，或者说引用吧。所以说兼具了传值和传地址。在使用的时候，就需要注意。<br>如果需要传递copy，可以对<strong>list做切片</strong>：</p>
+<pre><code><span class="keyword">copy</span> = <span class="type">list</span>[:]
+</code></pre><p>如上。</p>
+</li>
+<li><p>迭代器</p>
+<p>迭代器，也就是一般来说的循环。Python里有语法：</p>
+<pre><code><span class="keyword">for</span> item <span class="keyword">in</span> <span class="function"><span class="title">range</span><span class="params">(m)</span></span>:
+        ...
+</code></pre><p>其他编程语言必支持的流程控制语句。Python for语句对循环的容器，实际调用内建的iter()方法，获得迭代器，然后在调用obj.next()方法，遍历容器的元素。Python并没有类似Java，has_next()方法。利用的是异常。</p>
+</li>
+<li><p>yield</p>
+<p>函数带有yield语句，在执行的时候，保存当前状态，并返回到调用的地方。直到下次继续调用该方法的时候，继续从yield<strong>下一条指令</strong>开始执行。这是个很有用的特性。用来实现生成器。</p>
+</li>
+<li><p>with</p>
+<p>with语句，相当于try…catch语句的一种代替。有点类似c++的<strong>RAII</strong>技术。典型的例子：</p>
+<pre><code>with context_expression [as <span class="function"><span class="title">target</span><span class="params">(s)</span></span>]:
+    with-<span class="tag">body</span>   
+</code></pre><p>这里，with生成了上下文管理器对象，在with-body运行前，运行管理器对象的_<em>enter<strong>()方法，在结束运行\</strong>exit<strong>()方法。这里context_expression要返回一个上下文管理器对象，该对象并不赋值给 as 子句中的 target(s) ，如果指定了 as子句的话，会将上下文管理器的\</strong>enter_</em>() 方法的返回值赋值给 target(s)。<br>举个例子：</p>
+<pre><code><span class="keyword">with</span> open(<span class="string">r'somefileName'</span>) <span class="keyword">as</span> somefile:
+    <span class="keyword">for</span> line <span class="keyword">in</span> somefile:
+        <span class="keyword">print</span> line
+        <span class="comment"># ...more code</span>
+</code></pre><p>结束时，自动释放file资源。</p>
+</li>
+<li><p>生成器<br>生成器可以做，迭代器的全部事情。利用的就是yield语句。包含了yield语句的函数，就是一个生成器。使用生成器最大的好处，是不必一次缓存所有数据，而在每一次迭代中动态生成。如果迭代的数据量很大，或者内存敏感，就应该使用生成器。<br>举个例子：</p>
+<pre><code><span class="function"><span class="keyword">def</span> <span class="title">reverse</span><span class="params">(data)</span>:</span>
+    <span class="keyword">for</span> index <span class="keyword">in</span> range(len(data)-<span class="number">1</span>,-<span class="number">1</span>, -<span class="number">1</span>):
+        <span class="keyword">yield</span> data[index]
+
+<span class="keyword">for</span> char <span class="keyword">in</span> reverse(<span class="string">'hello'</span>):
+    print(char)
+</code></pre><p>这里print（char)的时候数据是在yield语句迭代生成的。实现上，生成器函数自动生成了iter()和 next()方法。</p>
+</li>
+<li><p>xrange()<br>xrange() 与range()的不同，就在与它是个生成器。</p>
+</li>
+<li><p>装饰器<br>包装函数，将目标函数包裹起来，做一些其他事情，对外可见的是包装后的函数。比如要对函数计时。</p>
+<pre><code><span class="function"><span class="keyword">def</span> <span class="title">timethis</span><span class="params">(func)</span>:</span>
+    <span class="decorator">@wraps(func)</span>
+    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args, **kwargs)</span>:</span>
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        print(func.__name__, end-start)
+        <span class="keyword">return</span> result
+    <span class="keyword">return</span> wrapper
+
+<span class="decorator">@timethis</span>
+<span class="function"><span class="keyword">def</span> <span class="title">countdown</span><span class="params">(n)</span>:</span>
+    <span class="keyword">while</span> n &gt; <span class="number">0</span>:
+        n -= <span class="number">1</span>
+
+countdown(<span class="number">100000</span>)
+</code></pre><p>@timethis 语法糖，标志了该函数的包装。在countdown调用时候，实际调用是，timethis(countdown)返回的wrap函数。</p>
+</li>
+<li><p>列表解析<br>使用列表解析可以简化代码的书写。而且避免不必要的编程逻辑。<br>举个例子，从一个输入列表中将所有大于0的整数平方生成一个新的序列，不使用列表解析：</p>
+<pre><code><span class="built_in">num</span> = [<span class="number">1</span>, <span class="number">4</span>, -<span class="number">5</span>, <span class="number">10</span>, -<span class="number">7</span>, <span class="number">2</span>, <span class="number">3</span>, -<span class="number">1</span>]
+filtered_and_squared = []
+<span class="keyword">for</span> <span class="built_in">number</span> <span class="operator">in</span> <span class="built_in">num</span>:
+    <span class="keyword">if</span> <span class="built_in">number</span> &gt; <span class="number">0</span>:
+        filtered_and_squared.append(<span class="built_in">number</span> ** <span class="number">2</span>)
+print filtered_and_squared
+</code></pre><p>需要初始化空列表，然后三行代码。使用列表解析：</p>
+<pre><code><span class="built_in">num</span> = [<span class="number">1</span>, <span class="number">4</span>, -<span class="number">5</span>, <span class="number">10</span>, -<span class="number">7</span>, <span class="number">2</span>, <span class="number">3</span>, -<span class="number">1</span>]
+filtered_and_squared = [ x**<span class="number">2</span> <span class="keyword">for</span> x <span class="keyword">in</span> <span class="built_in">num</span> <span class="keyword">if</span> x &gt; <span class="number">0</span>]
+<span class="built_in">print</span> filtered_and_squared
+</code></pre><p>可以看到非常简洁。而且省去了初始化空列表。重要的一点，它使你看起来是<strong>Python coder</strong>。。</p>
+</li>
+<li><p>代码风格<br>参看pep8。小知识点：<br>测试空容器： </p>
+<pre><code><span class="keyword">if</span> <span class="keyword">not</span> container：
+</code></pre><p>测试元素为None：</p>
+<pre><code><span class="keyword">if</span> x <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>：
+</code></pre></li>
+<li><p>命名空间和作用域<br>Python 有四个作用域，分别为：<br>local，enclose，global，built_in。符号解析的时候，依次搜索。找不到会抛出NameError异常，只有<strong>模块，类，和函数</strong>会引入新的作用域。<br>作用域是可以<strong>嵌套的</strong>，内层赋值语句会引入新的变量，有可能覆盖全局的变量。所以不推荐：</p>
+<p>   from a_module import *<br>导入变量有可能被覆盖。</p>
+</li>
+</ol>
+  
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
@@ -154,7 +234,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Python编程要点拾遗。"><span class="toc-number">1.</span> <span class="toc-text">Python编程要点拾遗。</span></a></li></ol>
  
   </div>
 
