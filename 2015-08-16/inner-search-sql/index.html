@@ -4,33 +4,37 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>linux进程第一篇 | 最初的梦想</title>
+    <title>Sql子查询 | 最初的梦想</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Neo">
     
 
     
-    <meta name="description" content="进程是程序运行的实体。静态的代码和数据要在操作系统层面运行，需要额外的属性，以便操作系统管理。这些属性包括：
-
-pid，进程标识符，标识不同的进程。实质为进程在内核的索引。内核为每个进程保存一个task_struct结构。并使用hash表加快查找速度。
-ppid，父进程标识符，linux中，进程均由其他进程衍生而来。其中init进程pid==1，没有父进程。父进程提前于子进程结束，子进程成为孤儿进">
+    <meta name="description" content="Sql子查询leetcode 数据库题一道。熟悉Sql子查询。
+示例：
+输出结果：sql语句：Write your MySQL query statement below
+select b.Name as Department,a.Name as Employee,a.Salary
+from Employee a join Department b on a.DepartmentId = b.Id">
 <meta property="og:type" content="article">
-<meta property="og:title" content="linux进程第一篇">
-<meta property="og:url" content="https://github.com/neo-v/neo-v.github.io/2015-04-05/linux-process/index.html">
+<meta property="og:title" content="Sql子查询">
+<meta property="og:url" content="https://github.com/neo-v/neo-v.github.io/2015-08-16/inner-search-sql/index.html">
 <meta property="og:site_name" content="最初的梦想">
-<meta property="og:description" content="进程是程序运行的实体。静态的代码和数据要在操作系统层面运行，需要额外的属性，以便操作系统管理。这些属性包括：
-
-pid，进程标识符，标识不同的进程。实质为进程在内核的索引。内核为每个进程保存一个task_struct结构。并使用hash表加快查找速度。
-ppid，父进程标识符，linux中，进程均由其他进程衍生而来。其中init进程pid==1，没有父进程。父进程提前于子进程结束，子进程成为孤儿进">
-<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/7e1cf9c7gw1eqwb6ion51j20m107umy0.jpg">
-<meta property="og:updated_time" content="2015-07-25T01:18:12.000Z">
+<meta property="og:description" content="Sql子查询leetcode 数据库题一道。熟悉Sql子查询。
+示例：
+输出结果：sql语句：Write your MySQL query statement below
+select b.Name as Department,a.Name as Employee,a.Salary
+from Employee a join Department b on a.DepartmentId = b.Id">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/emp_sql.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/emp1_sql.png">
+<meta property="og:updated_time" content="2015-08-16T14:16:30.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="linux进程第一篇">
-<meta name="twitter:description" content="进程是程序运行的实体。静态的代码和数据要在操作系统层面运行，需要额外的属性，以便操作系统管理。这些属性包括：
-
-pid，进程标识符，标识不同的进程。实质为进程在内核的索引。内核为每个进程保存一个task_struct结构。并使用hash表加快查找速度。
-ppid，父进程标识符，linux中，进程均由其他进程衍生而来。其中init进程pid==1，没有父进程。父进程提前于子进程结束，子进程成为孤儿进">
+<meta name="twitter:title" content="Sql子查询">
+<meta name="twitter:description" content="Sql子查询leetcode 数据库题一道。熟悉Sql子查询。
+示例：
+输出结果：sql语句：Write your MySQL query statement below
+select b.Name as Department,a.Name as Employee,a.Salary
+from Employee a join Department b on a.DepartmentId = b.Id">
 
     
     <link rel="alternative" href="/atom.xml" title="最初的梦想" type="application/atom+xml">
@@ -90,14 +94,14 @@ ppid，父进程标识符，linux中，进程均由其他进程衍生而来。�
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015-04-05/linux-process/" title="linux进程第一篇" itemprop="url">linux进程第一篇</a>
+      <a href="/2015-08-16/inner-search-sql/" title="Sql子查询" itemprop="url">Sql子查询</a>
   </h1>
   <p class="article-author">By
        
 		<a href="https://github.com/neo-v/neo-v.github.io/about" title="Neo" target="_blank" itemprop="author">Neo</a>
 		
   <p class="article-time">
-    <time datetime="2015-04-05T14:42:06.000Z" itemprop="datePublished"> 发表于 Apr 5 2015</time>
+    <time datetime="2015-08-16T14:14:49.000Z" itemprop="datePublished"> 发表于 Aug 16 2015</time>
     
   </p>
 </header>
@@ -106,29 +110,37 @@ ppid，父进程标识符，linux中，进程均由其他进程衍生而来。�
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Sql子查询"><span class="toc-number">1.</span> <span class="toc-text">Sql子查询</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#示例："><span class="toc-number">1.1.</span> <span class="toc-text">示例：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Sql执行顺序"><span class="toc-number">1.2.</span> <span class="toc-text">Sql执行顺序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#独立子查询"><span class="toc-number">1.3.</span> <span class="toc-text">独立子查询</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#相关子查询"><span class="toc-number">1.4.</span> <span class="toc-text">相关子查询</span></a></li></ol></li></ol>
 		
 		</div>
 		
-		<p>进程是程序运行的实体。静态的代码和数据要在操作系统层面运行，需要额外的属性，以便操作系统管理。这些属性包括：</p>
+		<h2 id="Sql子查询">Sql子查询</h2><p>leetcode 数据库题一道。熟悉Sql子查询。</p>
+<h3 id="示例："><strong>示例</strong>：</h3><img src="/assert/emp_sql.png">
+<p>输出结果：<br><img src="/assert/emp1_sql.png"><br>sql语句：<br><strong>Write your MySQL query statement below</strong></p>
+<pre><code>select <span class="tag">b</span><span class="class">.Name</span> as Department,<span class="tag">a</span><span class="class">.Name</span> as Employee,<span class="tag">a</span><span class="class">.Salary</span>
+from Employee <span class="tag">a</span> join Department <span class="tag">b</span> on <span class="tag">a</span><span class="class">.DepartmentId</span> = <span class="tag">b</span><span class="class">.Id</span>
+where (
+    select <span class="function"><span class="title">count</span><span class="params">(distinct(c.Salary)</span></span>)
+    from Employee c
+    where c<span class="class">.DepartmentId</span> = <span class="tag">a</span><span class="class">.DepartmentId</span> and c<span class="class">.Salary</span> &gt; <span class="tag">a</span><span class="class">.Salary</span>
+) &lt; <span class="number">3</span>
+<span class="attribute">order</span> by <span class="tag">a</span>.Salary
+</code></pre><h3 id="Sql执行顺序">Sql执行顺序</h3><p>理解子查询，首先要知道Sql的执行顺序。每个步骤都会产生虚表，即VT。</p>
 <ol>
-<li>pid，进程标识符，标识不同的进程。实质为进程在内核的索引。内核为每个进程保存一个<strong>task_struct</strong>结构。并使用hash表加快查找速度。</li>
-<li>ppid，父进程标识符，linux中，进程均由其他进程衍生而来。其中init进程pid==1，没有父进程。父进程提前于子进程结束，子进程成为孤儿进程（orphan process），孤儿进程被init进程收养。可利用该方法使子进程成为<strong>守护进程</strong>。父进程如果没有调用wait()或者waitid()方法处理结束的子进程，则子进程成为僵尸进程(zombie process)。</li>
-<li>pgid，进程组标识符，多个进程形成进程组，leader进程id，成为组id，形成组的好处，是可以批量接收信号。进程组的生命周期为创建至最后一个进程退出。</li>
-<li>session id，进程组可以形成会话。一个进程组称之为job，一个会话有前台和后台job。一个会话可以连接终端，前台job接受终端的输入输出，而后台不占有终端，前后台任务可以切换。终端键入中断键或者退出键，前台进程组所有进程都收到信号。</li>
+<li>FROM 子句, 组装来自不同数据源的数据，可以认为是提供<strong>数据来源</strong></li>
+<li>WHERE 子句, 基于指定的条件对记录进行筛选，基于<strong>全表的筛选</strong></li>
+<li>GROUP BY 子句, 将数据划分为多个分组，进行<strong>局部筛选准备</strong></li>
+<li>使用聚合函数进行计算，分组之后选择。</li>
+<li>使用 HAVING 子句筛选分组，使用<strong>聚合函数</strong>筛选。</li>
+<li>计算所有的表达式，select结果。</li>
+<li>使用 ORDER BY 对结果集进行排序</li>
 </ol>
-<p>进程状态：linux 源码定义了7种状态：</p>
-<ol>
-<li>R:running</li>
-<li>S:sleep</li>
-<li>D:disk sleep (不可中断)</li>
-<li>T:stop</li>
-<li>t:tracing stop</li>
-<li>X:dead</li>
-<li>Z:zombie</li>
-</ol>
-<p>进程状态转换关系为：<br><img src="http://ww2.sinaimg.cn/mw690/7e1cf9c7gw1eqwb6ion51j20m107umy0.jpg" alt="状态转移图"></p>
-<p>  进程状态在running和stop之间，running和sleep之间均可以相互转移。</p>
+<h3 id="独立子查询">独立子查询</h3><p>子查询与外部查询无关，一般提供outer 查询的条件数据</p>
+<pre><code><span class="keyword">select</span> ename,deptno,sal   
+<span class="keyword">from</span> emp   
+<span class="keyword">where</span> deptno=(<span class="keyword">select</span> deptno <span class="keyword">from</span> dept <span class="keyword">where</span> loc=<span class="string">'NEW YORK'</span>)；
+</code></pre><p>一般还有自查询返回多行的，原理相同。</p>
+<h3 id="相关子查询">相关子查询</h3><p>相关子查询，则是外部查询和内部查询相关。外部查询的每行，为内部查询提供支持。所以说，一般执行都是外部每一个记录，<strong>都运行子查询</strong>。<br>示例如开头。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -136,13 +148,13 @@ ppid，父进程标识符，linux中，进程均由其他进程衍生而来。�
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/操作系统/">操作系统</a>
+  <a class="article-category-link" href="/categories/数据库/">数据库</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/linux-process/">linux,process</a>
+  <span></span> <a href="/tags/子查询/">子查询</a>
   </div>
 
 </div>
@@ -151,7 +163,7 @@ ppid，父进程标识符，linux中，进程均由其他进程衍生而来。�
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="https://github.com/neo-v/neo-v.github.io/2015-04-05/linux-process/" data-title="linux进程第一篇 | 最初的梦想" data-tsina="undefined" class="share clearfix">
+	  <div data-url="https://github.com/neo-v/neo-v.github.io/2015-08-16/inner-search-sql/" data-title="Sql子查询 | 最初的梦想" data-tsina="undefined" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -164,19 +176,11 @@ ppid，父进程标识符，linux中，进程均由其他进程衍生而来。�
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015-04-07/process-new/" title="理解linux进程第二篇">
-  <strong>上一篇：</strong><br/>
-  <span>
-  理解linux进程第二篇</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015-04-03/charset/"  title="字符集和编码">
+<a href="/2015-08-14/Java-Lock/"  title="Java 多线程锁和同步机制">
  <strong>下一篇：</strong><br/> 
- <span>字符集和编码
+ <span>Java 多线程锁和同步机制
 </span>
 </a>
 </div>
@@ -191,7 +195,7 @@ ppid，父进程标识符，linux中，进程均由其他进程衍生而来。�
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Sql子查询"><span class="toc-number">1.</span> <span class="toc-text">Sql子查询</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#示例："><span class="toc-number">1.1.</span> <span class="toc-text">示例：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Sql执行顺序"><span class="toc-number">1.2.</span> <span class="toc-text">Sql执行顺序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#独立子查询"><span class="toc-number">1.3.</span> <span class="toc-text">独立子查询</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#相关子查询"><span class="toc-number">1.4.</span> <span class="toc-text">相关子查询</span></a></li></ol></li></ol>
  
   </div>
 
