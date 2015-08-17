@@ -1,0 +1,568 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>关于分布式系统的log | 最初的梦想</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Neo">
+    
+
+    
+    <meta name="description" content="关于分布式系统的log来源于Jay Kreps博文。关于log在分布式系统里的使用，顺便学习了Kafka消息系统。加深对分布式系统的理解。主要还是学习一些工程实践的方法论。理论指导实践，实践反作用理论。然后融会贯通。博文原地址
+the log
+什么是log什么是日志：recode what happened and when。记录发生了什么，在什么时间。所以日志文件有个特点，就是time，或者说o">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于分布式系统的log">
+<meta property="og:url" content="https://github.com/neo-v/neo-v.github.io/2015-08-17/the-log/index.html">
+<meta property="og:site_name" content="最初的梦想">
+<meta property="og:description" content="关于分布式系统的log来源于Jay Kreps博文。关于log在分布式系统里的使用，顺便学习了Kafka消息系统。加深对分布式系统的理解。主要还是学习一些工程实践的方法论。理论指导实践，实践反作用理论。然后融会贯通。博文原地址
+the log
+什么是log什么是日志：recode what happened and when。记录发生了什么，在什么时间。所以日志文件有个特点，就是time，或者说o">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/what_log.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/clock.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/log_replica.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/log_center.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/log_place.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/log_compaction.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/kafka.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/kafka_segment.png">
+<meta property="og:updated_time" content="2015-08-17T15:41:50.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关于分布式系统的log">
+<meta name="twitter:description" content="关于分布式系统的log来源于Jay Kreps博文。关于log在分布式系统里的使用，顺便学习了Kafka消息系统。加深对分布式系统的理解。主要还是学习一些工程实践的方法论。理论指导实践，实践反作用理论。然后融会贯通。博文原地址
+the log
+什么是log什么是日志：recode what happened and when。记录发生了什么，在什么时间。所以日志文件有个特点，就是time，或者说o">
+
+    
+    <link rel="alternative" href="/atom.xml" title="最初的梦想" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.png">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/pacman.png" alt="最初的梦想" title="最初的梦想"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="最初的梦想">最初的梦想</a></h1>
+				<h2 class="blog-motto">Hello World！</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:github.com/neo-v/neo-v.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015-08-17/the-log/" title="关于分布式系统的log" itemprop="url">关于分布式系统的log</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="https://github.com/neo-v/neo-v.github.io/about" title="Neo" target="_blank" itemprop="author">Neo</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-17T15:20:07.000Z" itemprop="datePublished"> 发表于 Aug 17 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#关于分布式系统的log"><span class="toc-number">1.</span> <span class="toc-text">关于分布式系统的log</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#the_log"><span class="toc-number">1.1.</span> <span class="toc-text">the log</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分布式系统的log"><span class="toc-number">1.2.</span> <span class="toc-text">分布式系统的log</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据仓库和ETL"><span class="toc-number">1.3.</span> <span class="toc-text">数据仓库和ETL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Log-structured_data_flow"><span class="toc-number">1.4.</span> <span class="toc-text">Log-structured data flow</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Building_a_Scalable_Log"><span class="toc-number">1.5.</span> <span class="toc-text">Building a Scalable Log</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Logs_&_Real-time_Stream_Processing"><span class="toc-number">1.6.</span> <span class="toc-text">Logs & Real-time Stream Processing</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#The_place_of_the_log_in_system_architecture"><span class="toc-number">1.7.</span> <span class="toc-text">The place of the log in system architecture</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#垃圾回收"><span class="toc-number">1.8.</span> <span class="toc-text">垃圾回收</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#kafka文件存储机制"><span class="toc-number">1.9.</span> <span class="toc-text">kafka文件存储机制</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h2 id="关于分布式系统的log">关于分布式系统的log</h2><p>来源于Jay Kreps博文。关于log在分布式系统里的使用，顺便学习了Kafka消息系统。加深对分布式系统的理解。主要还是学习一些<strong>工程实践的方法论</strong>。理论指导实践，实践反作用理论。然后融会贯通。<br><a href="http://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying" target="_blank" rel="external">博文原地址</a></p>
+<h3 id="the_log">the log</h3><ol>
+<li><p>什么是log<br>什么是日志：<strong>recode what happened and when</strong>。记录发生了什么，在什么时间。所以日志文件有个特点，<strong>就是time</strong>，或者说<strong>order</strong>，log可以充当逻辑时钟，可以方便地将“时间”与任一特定的物理时钟解耦。</p>
+<img src="/assert/what_log.png">
+</li>
+<li><p>log的作用<br>log最先出现在数据库中，用于记录日志。慢慢发展为数据复制功能。依据log做系统的undo和redo。log的作用还出现在：消息传递，data flow和实时计算等。</p>
+</li>
+</ol>
+<h3 id="分布式系统的log">分布式系统的log</h3><p> 在分布式系统中，log主要解决两个问题，<strong>ordering changing，distributing data</strong>。在分布式系统中，时间是个很重要的概念。Lamport提出的逻辑时钟，用来统一时间。不需要全局时钟，做逻辑同步。为什么分布式系统需要逻辑时钟，为了事件排序，知道事件的先后顺序，形成正确的处理顺序：<strong>happen-before</strong>。举个例子：A,B,C 三个进程各自携带自己的时间戳，A,B向C发送消息，由于时间不是全局的，那么可能出现C判断错误，处理结果错误的情况。<br><img src="/assert/clock.png"><br>然而log解决了这个问题。可以认为，log的entry是按照时间排序的。如果同步log，则逻辑上是统一的。<br>理论上来讲，我们可以记录一系列的机器指令，或者所调用方法的名称及参数，只要数据处理进程的行为相同，这些进程就可以保证跨节点的一致性。<br>文章还提到了一个理论，<strong>State Machine Replication Principle</strong>:<br>If two identical, deterministic processes begin in the same state and get the same inputs in the same order, they will produce the same output and end in the same state.<br>这个理论的应用，就是：<br>You can reduce the problem of making multiple machines all do the same thing to the problem of implementing a distributed consistent log to feed these processes input.<br><strong>所有机器做同一件事情，简化为实现一个基于log的分布式系统，每个进程处理一致的log。</strong><br>数据库中，逻辑日志和物理日志区分对待：<br><strong>物理日志</strong>：记录了所有的行内容的变化。<br><strong>逻辑日</strong>志：不是记录内容的变化，而是Insert , update , delete等导致行内容变化的SQL语句。<br>对分布式系统，通常有两种方式来处理和复制：<br>1） State machine model（active – active）<br>2） Primary-back model (active – passive)<br>也就是常说的主从模型和P2P模型。<br><img src="/assert/log_replica.png"><br>由此，log可以作为很多副本一致性算法 的<strong>数据结构</strong>。比如：<br><strong>Paxos<br>ZAB<br>RAFT<br>Viewstamped Replication</strong>。</p>
+<h3 id="数据仓库和ETL">数据仓库和ETL</h3><p> 略过</p>
+<h3 id="Log-structured_data_flow">Log-structured data flow</h3><p> log 是系统间数据流的<strong>天然数据结构</strong>。秘诀很简单：<br> Take all the organization’s data and put it into a central log for real-time subscription.<br>有一个居于centeral 的log.<br><img src="/assert/log_center.png"><br>如上所示，每个系统只需要知道log，就可以做自己该做的事情。并且可以应对系统变化。假设我们写入了一个编号为X的log，要从某个缓存服务器读取数据，为了不读到老数据，只需要保证：在缓存服务器将数据（同步）复制到X这个位置前，我们不从这个缓存中读取任何东西即可。可以将log理解为这样一种消息系统，其提供了持久性保证及强有序(<strong>strong ordering semantics</strong>)的语义，在通讯系统中，这称作原子广播。</p>
+<h3 id="Building_a_Scalable_Log">Building a Scalable Log</h3><p> 基于理论构建一个这样一个分布式系统。对log做分布式处理。支持并发。于是有了kafka系统。<br>文中提到一些 tricks：</p>
+<pre><code>-<span class="ruby"> <span class="constant">Partitioning</span> the log
+</span>-<span class="ruby"> <span class="constant">Optimizing</span> throughput by batching reads <span class="keyword">and</span> writes
+</span>-<span class="ruby"> <span class="constant">Avoiding</span> needless data copies</span>
+</code></pre><p>这些是构建一个分布式存储系统，常用的技术。<strong>批量写，文件分段，避免无效读写。</strong></p>
+<h3 id="Logs_&amp;_Real-time_Stream_Processing">Logs &amp; Real-time Stream Processing</h3><p> <strong>没怎么看懂。挖坑。以后来填</strong>。</p>
+<h3 id="The_place_of_the_log_in_system_architecture">The place of the log in system architecture</h3><img src="/assert/log_place.png">
+<h3 id="垃圾回收">垃圾回收</h3><p> <strong>log compaction</strong>日志如何删除？结合日志文件的特点，并不直接删除log entry。而是将log做合并。将最新的log entry 放在一个新的文件中，然后删除旧的文件。需要<strong>更新offset</strong>。如图：<br><img src="/assert/log_compaction.png"></p>
+<h3 id="kafka文件存储机制">kafka文件存储机制</h3><p>一个商业化消息队列的性能好坏，其<strong>文件存储机</strong>制设计是衡量一个消息队列服务技术水平和最关键指标之一。上面讲了很多理论。<strong>技术最终是要落地的。也就是要落到实处</strong>。看看Kafka是怎么实现log的应用的。<br>Apache Kafka与传统消息系统相比，有以下不同：</p>
+<ul>
+<li>它被设计为一个分布式系统，易于向外扩展；</li>
+<li>它同时为发布和订阅提供高吞吐量；</li>
+<li>它支持多订阅者，当失败时能自动平衡消费者；</li>
+<li>它将消息持久化到磁盘，因此可用于批量消费，例如ETL，以及实时应用程序。</li>
+</ul>
+<p><strong>Broker</strong><br>Kafka集群包含一个或多个服务器，这种服务器被称为broker<br><strong>Topic</strong><br>每条发布到Kafka集群的消息都有一个类别，这个类别被称为Topic。（物理上不同Topic的消息分开存储，逻辑上一个Topic的消息虽然保存于一个或多个broker上但用户只需指定消息的Topic即可生产或消费数据而不必关心数据存于何处）<br><strong>Partition</strong><br>Parition是物理上的概念，每个Topic包含一个或多个Partition.<br><strong>Producer</strong><br>负责发布消息到Kafka broker<br><strong>Consumer</strong><br>消息消费者，向Kafka broker读取消息的客户端。<br><strong>Consumer Group</strong><br>每个Consumer属于一个特定的Consumer Group（可为每个Consumer指定group name，若不指定group name则属于默认的group）。</p>
+<p><strong>存储设计</strong>：<br>分析一个topic，多个patition，一个broker。<br>一个topic是逻辑概念，对应的实际存储空间是patition，一个partition对应了一个文件夹/，消息存储在partition下的file中。kafka将大文件分割为多个小文件，称为segment file，同时为了提升性能，对segment file 做了索引，有一个index file。<br><img src="/assert/kafka.png"><br>好处是，批量写，删除方便。<br>具体的文件结构：<br><img src="/assert/kafka_segment.png"></p>
+<p>例如读取offset=368776的message，需要通过下面2个步骤查找。<br><strong>第一步</strong>查找segment file<br>以上图为例，其中00000000000000000000.index表示最开始的文件，起始偏移量(offset)为0.第二个文件00000000000000368769.index的消息量起始偏移量为368770 = 368769 + 1.同样，第三个文件00000000000000737337.index的起始偏移量为737338=737337 + 1，其他后续文件依次类推，以起始偏移量命名并排序这些文件，只要根据offset <strong>二分查找</strong>文件列表，就可以快速定位到具体文件。<br>当offset=368776时定位到00000000000000368769.index|log<br><strong>第二步</strong>通过segment file查找message<br>通过第一步定位到segment file，当offset=368776时，依次定位到00000000000000368769.index的元数据物理位置和00000000000000368769.log的<strong>物理偏移地址</strong>，然后再通过00000000000000368769.log顺序查找直到offset=368776为止。</p>
+<p>文件存储机制的有点：</p>
+<ol>
+<li>文件分割，便于删除旧数据</li>
+<li>索引提高速度。</li>
+<li>缓存索引，进一步提高速度</li>
+</ol>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/分布式系统/">分布式系统</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/分布式，log/">分布式，log</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://github.com/neo-v/neo-v.github.io/2015-08-17/the-log/" data-title="关于分布式系统的log | 最初的梦想" data-tsina="undefined" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015-08-16/inner-search-sql/"  title="Sql子查询">
+ <strong>下一篇：</strong><br/> 
+ <span>Sql子查询
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#关于分布式系统的log"><span class="toc-number">1.</span> <span class="toc-text">关于分布式系统的log</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#the_log"><span class="toc-number">1.1.</span> <span class="toc-text">the log</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分布式系统的log"><span class="toc-number">1.2.</span> <span class="toc-text">分布式系统的log</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据仓库和ETL"><span class="toc-number">1.3.</span> <span class="toc-text">数据仓库和ETL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Log-structured_data_flow"><span class="toc-number">1.4.</span> <span class="toc-text">Log-structured data flow</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Building_a_Scalable_Log"><span class="toc-number">1.5.</span> <span class="toc-text">Building a Scalable Log</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Logs_&_Real-time_Stream_Processing"><span class="toc-number">1.6.</span> <span class="toc-text">Logs & Real-time Stream Processing</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#The_place_of_the_log_in_system_architecture"><span class="toc-number">1.7.</span> <span class="toc-text">The place of the log in system architecture</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#垃圾回收"><span class="toc-number">1.8.</span> <span class="toc-text">垃圾回收</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#kafka文件存储机制"><span class="toc-number">1.9.</span> <span class="toc-text">kafka文件存储机制</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/体系结构/" title="体系结构">体系结构<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/分布式系统/" title="分布式系统">分布式系统<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/助教/" title="助教">助教<sup>8</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/工程理论实践/" title="工程理论实践">工程理论实践<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/操作系统/" title="操作系统">操作系统<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/日志/" title="日志">日志<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法和数据结构/" title="算法和数据结构">算法和数据结构<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/编码/" title="编码">编码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/编程语言和理论/" title="编程语言和理论">编程语言和理论<sup>6</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/assistant，embed，Galileo/" title="assistant，embed，Galileo">assistant，embed，Galileo<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/assistant/" title="assistant">assistant<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/javascript/" title="javascript">javascript<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/life/" title="life">life<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/linux-process/" title="linux,process">linux,process<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/单例模式/" title="单例模式">单例模式<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/side-effect/" title="side-effect">side-effect<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pthread/" title="pthread">pthread<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/线程同步/" title="线程同步">线程同步<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/beauty-of-programming/" title="beauty of programming">beauty of programming<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/prototype/" title="prototype">prototype<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/oop/" title="oop">oop<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/事务/" title="事务">事务<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/process/" title="process">process<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fork/" title="fork">fork<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/exec/" title="exec">exec<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/软件开发/" title="软件开发">软件开发<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存，分布式，CDN/" title="缓存，分布式，CDN">缓存，分布式，CDN<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/子查询/" title="子查询">子查询<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/journal/" title="journal">journal<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="weiboshow">
+  <p class="asidetitle">我的微博</p>
+   <iframe width="100%" height="400" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=400&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=0&uid=2115828167&verifier=7b807bb3&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello,I&#39;m neo <br/>
+			nice to meet you</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/https://github.com/neo-v" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:pirloandkaka@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="https://github.com/neo-v/neo-v.github.io/about" target="_blank" title="Neo">Neo</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
