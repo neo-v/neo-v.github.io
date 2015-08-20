@@ -34,8 +34,15 @@
 源端口和目的端口:各占2字节.端口是传输层与应用层的服务接口.传输层的复用和分用功能都要通过端口才能实现
 序号:占 4 字节">
 <meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/tcp_stack.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/tcp_package.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/tcp_handshake.png">
 <meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/tcp_h1.png">
-<meta property="og:updated_time" content="2015-08-20T14:27:25.000Z">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/tcp_handshake.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/tcp_close.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/tcp_send.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/tcp_recv.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/tcp_block.png">
+<meta property="og:updated_time" content="2015-08-20T14:32:41.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Tcp协议--上篇">
 <meta name="twitter:description" content="协议概述
@@ -129,7 +136,7 @@
 		<h2 id="协议概述">协议概述</h2><ol>
 <li>分层<br>分层的思想在计算机科学中十分重要，TCP/IP网络就是分层的。分层的好处在于结构清晰，职责明确，易于实现。每层做好自己的事情。对上层提供一个接口，形成上层对下层的一个<strong>抽象视图</strong>。</li>
 <li>协议栈<br>协议的分层，形成了<strong>协议栈</strong><img src="/assert/tcp_stack.png"></li>
-<li>数据包格式<br>tcp协议的数据包格式：<img class="assert/tcp_package.png">
+<li>数据包格式<br>tcp协议的数据包格式：<img src="/assert/tcp_package.png">
 字段说明：</li>
 </ol>
 <ul>
@@ -164,7 +171,7 @@
 </ul>
 <h2 id="三次握手">三次握手</h2><p>Tcp协议建立连接的方式为著名的“三次握手”。握手的本质，就是为了协商通讯的数据。两边维护一个统一的数据结构，也可以认为<strong>初始化状态机</strong>。</p>
 <ol>
-<li>状态图<img class="assert/tcp_handshake.png"></li>
+<li>状态图<img src="/assert/tcp_handshake.png"></li>
 <li>过程分析</li>
 </ol>
 <ul>
@@ -175,7 +182,7 @@
 <ol>
 <li>抓包分析(注意序号变化)<img src="/assert/tcp_h1.png"></li>
 <li>为什么是三次握手<br>还是为了应对异常。握手数据包可能阻塞在网络中。<br>一种异常情况：首次建立连接的数据包丢失。客户端再次发送连接请求，于是网络中存在两个建立连接的数据包。服务器相应第二个并关闭连接之后，第一次发送的建立连接报文到达。于是服务器以为建立新的连接，再次开启连接。而实际上并没有。加入第三次握手，使得服务器应答之后，可以感知发起的客户端状态。由于客户端不会相应第三次。所以服务器关闭。<h2 id="四次挥手">四次挥手</h2>释放连接，就是释放连接的资源，并将状态与下次建立连接区分开来。Tcp是全双工的，断开需要在两面各自发送断开请求。(<strong>Linux Socket 编程中，调用close()双端关闭。不知道如何实现。shutdown()半关闭</strong>)</li>
-<li>状态图<img class="assert/tcp_handshake.png"></li>
+<li>状态图<img src="/assert/tcp_handshake.png"></li>
 <li>过程分析</li>
 </ol>
 <ul>
@@ -185,11 +192,11 @@
 <li>Clinet收到连接释放报文段后,必须发出确认,在确认报文段中 ACK = 1,确认号 ack=y+2,自己的序号 seq = x + 3</li>
 </ul>
 <ol>
-<li>抓包分析(注意序号变化)<img class="assert/tcp_close.png"></li>
+<li>抓包分析(注意序号变化)<img src="/assert/tcp_close.png"></li>
 <li>为什么是四次挥手<br>全双工，需要双端关闭。分别发起关闭连接。<br>如果服务器关闭确认和他自己的关闭请求之间，没有数据发送。那么2、3步骤可以合并一个数据包[ACK,FIN]。这样数据交互有三次。<br>5.为什么Client 等待2MSL(TIME_WAIT)？<br>还是为了应对网络异常。<br>一种情况：客户端确认丢失，服务器将会发起再次关闭。这个时候客户端需要响应。所以Client需要确保服务器关闭。</li>
 </ol>
 <h2 id="协议栈数据包大小关系分析">协议栈数据包大小关系分析</h2><p>假设底层为以太网。<br>链路层：MTU = 1500<br>IP层：  IP首部20字节 MTU = 1480<br>Tcp：   假如首部20B  MTU = 1460<br>但是对于我们在应用层编程，其实不用太关心长度。原因在与IP协议。<br>IP协议提供了数据分片功能，IP协议规定的总长度为2字节 == 65535，长度超过之后就会分片，IP之后会重组。<strong>所以说TCP是面向流的协议</strong>。。<br>顺便说，UDP协议面向数据报的，分片丢失就没有了。所以最好不要超过MTU。</p>
-<h2 id="数据发送流程">数据发送流程</h2><p>发送栈：<br><img class="assert/tcp_send.png"><br>说明：<br>假设数据发送有APP层 调用Write()开始，从数据经过的存储空间，依次讨论</p>
+<h2 id="数据发送流程">数据发送流程</h2><p>发送栈：<br><img src="/assert/tcp_send.png"><br>说明：<br>假设数据发送有APP层 调用Write()开始，从数据经过的存储空间，依次讨论</p>
 <ol>
 <li>用户区<br>用户首先构造需要发送的数据buf[]<br>write()函数调用，将数据copy到内核缓冲区。</li>
 <li>内核区</li>
@@ -207,7 +214,7 @@
 <li>发送数据，根据以太网规则发送，加入同步码（preamble）和crc校验和。</li>
 <li>中断程序，返回发送数据。<strong>主要是为应答，做暂存</strong>。</li>
 </ul>
-<h2 id="数据接收流程">数据接收流程</h2><p>接收栈：<br><img class="assert/tcp_recv.png"><br>说明：<br>接收数据基本是发送的逆序，主要在拆包。</p>
+<h2 id="数据接收流程">数据接收流程</h2><p>接收栈：<br><img src="/assert/tcp_recv.png"><br>说明：<br>接收数据基本是发送的逆序，主要在拆包。</p>
 <ol>
 <li>设备区</li>
 </ol>
@@ -231,7 +238,7 @@
 <ul>
 <li>read()数据</li>
 </ul>
-<h2 id="Tcp_control_block_逻辑结构">Tcp control block 逻辑结构</h2><img class="assert/tcp_block.png">
+<h2 id="Tcp_control_block_逻辑结构">Tcp control block 逻辑结构</h2><img src="/assert/tcp_block.png">
 <p>可以看到，在linux中，一切都是file，通过file找到socket描述符，描述符关联了Tcb结构，引用了tcp_sock。tcp_sock可以分为sock,inet_sock等等,用来支持除了TCP之外的协议，可以认为这是一种多态。<br>所有TCP协议用到的状态信息都被存在tcp_sock里。例如顺序号、接收窗口、阻塞控制和重发送定时器都保存在tcp_sock中。<br>Tcp查找接受数据和对应socket的方法为hash。系统会用数据包的&lt;来源ip，目标ip，来源端口，目标端口&gt;和Jenkins哈希算法去计算哈希值。选择这个哈希函数的原因是为了防止对哈希表的攻击。</p>
   
 	</div>
