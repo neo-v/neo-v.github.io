@@ -1,0 +1,622 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Tcp协议--下篇 | 最初的梦想</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Neo">
+    
+
+    
+    <meta name="description" content="Tcp协议-下篇
+上篇分析了Tcp协议和Tcp协议栈的一些基本概念。下篇来总结Tcp的高阶概念。
+可靠性
+什么是Tcp的可靠性Tcp假设下层协议是不可靠的，确实IP层就是所谓尽最大努力交付。Tcp可靠性传输表现在：
+数据完整性
+解决重复接收
+解决数据丢失
+解决乱序到达问题为了实现上述目标，Tcp协议使用了序号机制，数据包应答和超时重传机制。
+
+
+序列号确认机制
+上篇介绍过了序列号，Tcp的可靠性保">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tcp协议--下篇">
+<meta property="og:url" content="https://github.com/neo-v/neo-v.github.io/2015-08-21/tcp-part2/index.html">
+<meta property="og:site_name" content="最初的梦想">
+<meta property="og:description" content="Tcp协议-下篇
+上篇分析了Tcp协议和Tcp协议栈的一些基本概念。下篇来总结Tcp的高阶概念。
+可靠性
+什么是Tcp的可靠性Tcp假设下层协议是不可靠的，确实IP层就是所谓尽最大努力交付。Tcp可靠性传输表现在：
+数据完整性
+解决重复接收
+解决数据丢失
+解决乱序到达问题为了实现上述目标，Tcp协议使用了序号机制，数据包应答和超时重传机制。
+
+
+序列号确认机制
+上篇介绍过了序列号，Tcp的可靠性保">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/tcp_router.png">
+<meta property="og:updated_time" content="2015-08-21T15:28:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tcp协议--下篇">
+<meta name="twitter:description" content="Tcp协议-下篇
+上篇分析了Tcp协议和Tcp协议栈的一些基本概念。下篇来总结Tcp的高阶概念。
+可靠性
+什么是Tcp的可靠性Tcp假设下层协议是不可靠的，确实IP层就是所谓尽最大努力交付。Tcp可靠性传输表现在：
+数据完整性
+解决重复接收
+解决数据丢失
+解决乱序到达问题为了实现上述目标，Tcp协议使用了序号机制，数据包应答和超时重传机制。
+
+
+序列号确认机制
+上篇介绍过了序列号，Tcp的可靠性保">
+
+    
+    <link rel="alternative" href="/atom.xml" title="最初的梦想" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.png">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/pacman.png" alt="最初的梦想" title="最初的梦想"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="最初的梦想">最初的梦想</a></h1>
+				<h2 class="blog-motto">Hello World！</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:github.com/neo-v/neo-v.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015-08-21/tcp-part2/" title="Tcp协议--下篇" itemprop="url">Tcp协议--下篇</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="https://github.com/neo-v/neo-v.github.io/about" title="Neo" target="_blank" itemprop="author">Neo</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-21T15:19:54.000Z" itemprop="datePublished"> 发表于 Aug 21 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Tcp协议-下篇"><span class="toc-number">1.</span> <span class="toc-text">Tcp协议-下篇</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#可靠性"><span class="toc-number">1.1.</span> <span class="toc-text">可靠性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#流量控制"><span class="toc-number">1.2.</span> <span class="toc-text">流量控制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#拥塞控制"><span class="toc-number">1.3.</span> <span class="toc-text">拥塞控制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#缺陷"><span class="toc-number">1.4.</span> <span class="toc-text">缺陷</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#http请求的Tcp瓶颈分析"><span class="toc-number">1.5.</span> <span class="toc-text">http请求的Tcp瓶颈分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#socket编程注意事项"><span class="toc-number">1.6.</span> <span class="toc-text">socket编程注意事项</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h1 id="Tcp协议-下篇">Tcp协议-下篇</h1><hr>
+<p>上篇分析了Tcp协议和Tcp协议栈的一些基本概念。下篇来总结Tcp的高阶概念。</p>
+<h2 id="可靠性">可靠性</h2><ol>
+<li>什么是Tcp的可靠性<br>Tcp假设下层协议是不可靠的，确实IP层就是所谓尽最大努力交付。Tcp可靠性传输表现在：<ul>
+<li>数据完整性</li>
+<li>解决重复接收</li>
+<li>解决数据丢失</li>
+<li>解决乱序到达问题<br>为了实现上述目标，Tcp协议使用了<strong>序号机制，数据包应答和超时重传机制</strong>。</li>
+</ul>
+</li>
+<li>序列号确认机制<ul>
+<li>上篇介绍过了序列号，Tcp的可靠性保证基本就是序号机制。给<strong>字节</strong>编上号码，所以说是基于字节流的协议。Tcp协议在一方发送了数据包之后，对端需要对接收数据发送ACK包。表达所期望接收的下一个字节编号。</li>
+<li>除此之外，序号还可以将乱序到达的数据包组装。Tcp协议并未规定如何处理乱序到达的数据包，但是如果内存允许，Tcp建议，缓存乱序数据包，而不是简单丢弃。通过某种机制来对乱序数据包重组。避免重传风暴，一个分段丢失，引起大量的重传。</li>
+<li>Tcp确认具有<strong>累计确认功能</strong>。即如何确认了X序号接收，则表示，X之前的序号都收到，减小网络流量。</li>
+</ul>
+</li>
+<li><p>超时重传(RTO)<br>Tcp需要解决数据包在网络丢失的问题。通过序列号确认机制，可以发现丢失的数据包。</p>
+<ul>
+<li><p>超时<br>Tcp在一定时间没有收到确认包，则认为数据包丢失，发起重传。这里，如何选择超时时间，如何管理计时器又是<strong>比较麻烦</strong>的问题。理论上可以认为，Tcp每个报文都有计时器，重传时间为RTO，计算方法：</p>
+<p>   RTO=RTTS + 4×RTTD<br>   RTTS = ( 1 - α)×(旧的 RTTS)＋α(新的 RTT 样本)<br>   RTTD = (1-β)×(旧的RTTD)+β×|RTTS﹣新的 RTT 样本(RTTD 是 RTT 的偏差的加权平均值)<br>重传时间是变动的，实时计算。</p>
+</li>
+<li>重传<br>当超过了RTO，Tcp选择重传报文。</li>
+</ul>
+</li>
+</ol>
+<h2 id="流量控制">流量控制</h2><p>流量控制基于滑动窗口，原理非常简单，基本就是一个生产者/消费者模型。接受端来决定发送端发送数量，控制发送流量。<br>Tcp协议头部有个window字段。来作为接受端窗口大小。<br>如果单从流量控制角度看，整个过程是：</p>
+<ul>
+<li>发送端控制一个发送窗口，大小取决于接收端的反馈。然后由于延迟，两边并不一定任何时刻大小相同。</li>
+<li>发送端发送的数据不能超过窗口大小。</li>
+<li>窗口的滑动取决于ACK包 ，确认多少字节数据，窗口滑动多少字节。大小取决于window字段。</li>
+</ul>
+<h2 id="拥塞控制">拥塞控制</h2><p>Tcp协议还涉及网络拥塞的控制，在发送数据的过程中，感知网络流量的状况。这种感知是通过拥塞机制来实现。实际上，Tcp是看不到下层IP的流量状况的。他只能做<strong>探测和猜测</strong>。当网络数据包频繁收不到ACK的时候，认为网络发生了拥塞。</p>
+<ol>
+<li>拥塞控制原理：<br>拥塞控制主要通过拥塞窗口<strong>Cwind</strong>，这个窗口并不在Tcp协议中，但是在操作系统的Tcp数据结构中保存。因为这个值在于对网络流量的猜测，不需要携带交互。通过控制拥塞窗口的大小，来决定<strong>向网络投放</strong>多少数据。以缓解或者利用网络带宽。</li>
+<li>拥塞控制方法：<br>实际方法：<ul>
+<li>慢启动<br>没必要一开始就向网络投放大量数据，慢慢探测网络状况，向网络中投放数据。所以Cwind刚开始为1个MSS，即发送一个报文段。然后再收到一个RTT之后的ACK包，扩大为2个MSS，之后继续开始指数增大。即1 <em> MSS，2 </em> MSS，2 <em> 2 </em> MSS。。。可以看到慢开始算法一点也不慢。。</li>
+<li>拥塞避免<br>慢开始算法，不可能无限增长，这样会很快耗尽网络带宽。于是设定了一个门限值。即Sstresh。初始 = 65535B.超过这个值，开始拥塞避免算法。即缓慢的线性增长，提升Cwind。</li>
+</ul>
+</li>
+</ol>
+<p>上述算法，是在没有拥塞的情况下，主动控制的一种行为。那么在连续接收不到ACK，表明网络很有可能已经拥塞的情况下，Tcp如何控制呢。在超时重传数据包后，算法将 Sstrech = cwind <em> 0.5，然后<em>*重新进入慢开始阶段</em></em>。缓慢向网络发送数据。</p>
+<ul>
+<li>快重传<br>拥塞控制太过于死板，数据包收不到ACK，就要进入慢开始，没必要。于是加入了快重传和快恢复算法。快速重传，要求 接收方在收到乱序数据包，立即发送冗余的ACK数据包。在接到连续三个冗余ACK，发送端即发送丢失的数据包。<ul>
+<li>快恢复<br>然后将Sstrech = cwind <em> 0.5，进入拥塞避免算法。cwind = sstrech，窗口线性增大，而不是进入慢开始阶段。<br><em>*这个过程中如果快重传之后，然后收到冗余ACK，拥塞窗口增大MSS，但是连续收到，则表明网络很差，继续减下，再次进入快重传。</em></em></li>
+</ul>
+</li>
+</ul>
+<h2 id="缺陷">缺陷</h2><p>Tcp协议并非完美，实际上，Tcp协议由于历史的原因。设计上并不一定适合所有场景。<br>Tcp也并不是完全可靠。。</p>
+<ol>
+<li>IP和TCP协议在头部都会有check sum错误校验和机制，16位表示，反码相加，结果求反。一般错误很轻松可检测出来，但遇到两个16位数字相加后结果不变的情况就一筹莫展了。</li>
+<li>以太网帧CRC32校验一般情况下都很OK，但可能遇到两端隔离多个路由器情况下，就有可能出现问题。<img src="/assert/tcp_router.png">
+上图中Client向Server发了一个TCP segment，这个segment先被封装成一个IP packet，再被封装成ethernet frame，发送到路由器（图中消息a）。Router收到ethernet frame (b)，转发到另一个网段(c)，最后Server收到d，通知应用程序。Ethernet CRC能保证a和b相同，c和d相同；TCP header check sum的强度不足以保证收发payload的内容一样。另外，如果把Router换成NAT，那么NAT自己会构造c（替换掉源地址），这时候a和d的payload不能用tcp header checksum校验。</li>
+</ol>
+<h2 id="http请求的Tcp瓶颈分析">http请求的Tcp瓶颈分析</h2><p>从上层协议的视角来看待Tcp协议。<br>Http协议运行在Tcp之上，所以Tcp的运作，对于Http性能有很大影响。</p>
+<ol>
+<li>三次握手，每个连接都要三次握手，完成才可以发送数据，所以最好复用连接。</li>
+<li>流量窗口，大小2字节，rwind不能超过64K，现在基本可以扩展，通过TCP Window Scaling = 4</li>
+<li>拥塞窗口，慢开始不能一开始就利用网络带宽。现在google表示cwind初始值最好 = 10</li>
+<li>TCP 的队首(HOL,Head of Line)阻塞，必须有序才可以交付数据。某些场景下,丢包是让 TCP 达到最佳性能的关键。有些应用程序可以容忍丢失一定数量的包,比如语音和游戏状态通信,就不需要可靠传输或按序交付。</li>
+</ol>
+<h2 id="socket编程注意事项">socket编程注意事项</h2><p>学习了Tcp协议这么多概念，对开发人员来说，最直接的使用还是在于Socket编程。那么使用Socket编程该注意那些事项呢。</p>
+<ol>
+<li>Tcp粘包</li>
+<li>send()/write() <strong>≠</strong> 发送</li>
+</ol>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/计算机网络/">计算机网络</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/网络，Tcp/">网络，Tcp</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://github.com/neo-v/neo-v.github.io/2015-08-21/tcp-part2/" data-title="Tcp协议--下篇 | 最初的梦想" data-tsina="undefined" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015-08-20/tcp-part1/"  title="Tcp协议--上篇">
+ <strong>下一篇：</strong><br/> 
+ <span>Tcp协议--上篇
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Tcp协议-下篇"><span class="toc-number">1.</span> <span class="toc-text">Tcp协议-下篇</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#可靠性"><span class="toc-number">1.1.</span> <span class="toc-text">可靠性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#流量控制"><span class="toc-number">1.2.</span> <span class="toc-text">流量控制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#拥塞控制"><span class="toc-number">1.3.</span> <span class="toc-text">拥塞控制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#缺陷"><span class="toc-number">1.4.</span> <span class="toc-text">缺陷</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#http请求的Tcp瓶颈分析"><span class="toc-number">1.5.</span> <span class="toc-text">http请求的Tcp瓶颈分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#socket编程注意事项"><span class="toc-number">1.6.</span> <span class="toc-text">socket编程注意事项</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/体系结构/" title="体系结构">体系结构<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/分布式系统/" title="分布式系统">分布式系统<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/助教/" title="助教">助教<sup>8</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/工程理论实践/" title="工程理论实践">工程理论实践<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/操作系统/" title="操作系统">操作系统<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/日志/" title="日志">日志<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法和数据结构/" title="算法和数据结构">算法和数据结构<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/编码/" title="编码">编码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/编程语言和理论/" title="编程语言和理论">编程语言和理论<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/计算机网络/" title="计算机网络">计算机网络<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/assistant，embed，Galileo/" title="assistant，embed，Galileo">assistant，embed，Galileo<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/assistant/" title="assistant">assistant<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/网络，Tcp/" title="网络，Tcp">网络，Tcp<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/javascript/" title="javascript">javascript<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/life/" title="life">life<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/软件开发/" title="软件开发">软件开发<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/单例模式/" title="单例模式">单例模式<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/side-effect/" title="side-effect">side-effect<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/分布式，存储/" title="分布式，存储">分布式，存储<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pthread/" title="pthread">pthread<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/线程同步/" title="线程同步">线程同步<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/事务/" title="事务">事务<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/prototype/" title="prototype">prototype<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/oop/" title="oop">oop<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/分布式，log/" title="分布式，log">分布式，log<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/process/" title="process">process<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fork/" title="fork">fork<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/exec/" title="exec">exec<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存，分布式，CDN/" title="缓存，分布式，CDN">缓存，分布式，CDN<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/linux-process/" title="linux,process">linux,process<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="weiboshow">
+  <p class="asidetitle">我的微博</p>
+   <iframe width="100%" height="400" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=400&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=0&uid=2115828167&verifier=7b807bb3&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello,I&#39;m neo <br/>
+			nice to meet you</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/https://github.com/neo-v" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:pirloandkaka@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="https://github.com/neo-v/neo-v.github.io/about" target="_blank" title="Neo">Neo</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
