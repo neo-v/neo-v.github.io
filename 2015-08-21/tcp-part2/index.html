@@ -44,7 +44,7 @@
 序列号确认机制
 上篇介绍过了序列号，Tcp的可靠性保证基本就是序">
 <meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/tcp_router.png">
-<meta property="og:updated_time" content="2015-08-21T15:31:43.000Z">
+<meta property="og:updated_time" content="2015-08-21T15:33:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Tcp协议--下篇">
 <meta name="twitter:description" content="上篇分析了Tcp协议和Tcp协议栈的一些基本概念。下篇来总结Tcp的高阶概念。
@@ -183,10 +183,10 @@
 </li>
 </ol>
 <p>上述算法，是在没有拥塞的情况下，主动控制的一种行为。那么在连续接收不到ACK，表明网络很有可能已经拥塞的情况下，Tcp如何控制呢。在超时重传数据包后，算法将 Sstrech = cwind <em> 0.5，然后<em>*重新进入慢开始阶段</em></em>。缓慢向网络发送数据。</p>
-<ul>
+<ol>
 <li>快重传<br>拥塞控制太过于死板，数据包收不到ACK，就要进入慢开始，没必要。于是加入了快重传和快恢复算法。快速重传，要求 接收方在收到乱序数据包，立即发送冗余的ACK数据包。在接到连续三个冗余ACK，发送端即发送丢失的数据包。</li>
 <li>快恢复<br>然后将Sstrech = cwind <em> 0.5，进入拥塞避免算法。cwind = sstrech，窗口线性增大，而不是进入慢开始阶段。<br><em>*这个过程中如果快重传之后，然后收到冗余ACK，拥塞窗口增大MSS，但是连续收到，则表明网络很差，继续减下，再次进入快重传。</em></em></li>
-</ul>
+</ol>
 <h2 id="缺陷">缺陷</h2><p>Tcp协议并非完美，实际上，Tcp协议由于历史的原因。设计上并不一定适合所有场景。<br>Tcp也并不是完全可靠。。</p>
 <ol>
 <li>IP和TCP协议在头部都会有check sum错误校验和机制，16位表示，反码相加，结果求反。一般错误很轻松可检测出来，但遇到两个16位数字相加后结果不变的情况就一筹莫展了。</li>
