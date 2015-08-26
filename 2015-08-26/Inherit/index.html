@@ -1,0 +1,680 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>C++ 继承机制和对象模型 | 最初的梦想</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Neo">
+    
+
+    
+    <meta name="description" content="关于C++语言内存继承机制的学习，学习语言的设计。
+C++普通单一继承C++普通继承，指的是单一继承，分两种情况，有虚函数和没有虚函数。
+无虚函数没有虚函数的单一继承是最简单的。内存布局，即为基类数据+子类数据。比如：
+class Top
+{
+    int a；
+}；
+class Child：public Top
+{
+    int b;
+}
+Child的布局结构为：
+有虚函数有虚函数的单一继承">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ 继承机制和对象模型">
+<meta property="og:url" content="https://github.com/neo-v/neo-v.github.io/2015-08-26/Inherit/index.html">
+<meta property="og:site_name" content="最初的梦想">
+<meta property="og:description" content="关于C++语言内存继承机制的学习，学习语言的设计。
+C++普通单一继承C++普通继承，指的是单一继承，分两种情况，有虚函数和没有虚函数。
+无虚函数没有虚函数的单一继承是最简单的。内存布局，即为基类数据+子类数据。比如：
+class Top
+{
+    int a；
+}；
+class Child：public Top
+{
+    int b;
+}
+Child的布局结构为：
+有虚函数有虚函数的单一继承">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/danyi.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/danyixuhanshu.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/nor_inherit.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/nor_int.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/vir_amb.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/vir_inherit.png">
+<meta property="og:image" content="https://github.com/neo-v/neo-v.github.io/assert/vir_int.png">
+<meta property="og:updated_time" content="2015-08-26T06:36:47.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C++ 继承机制和对象模型">
+<meta name="twitter:description" content="关于C++语言内存继承机制的学习，学习语言的设计。
+C++普通单一继承C++普通继承，指的是单一继承，分两种情况，有虚函数和没有虚函数。
+无虚函数没有虚函数的单一继承是最简单的。内存布局，即为基类数据+子类数据。比如：
+class Top
+{
+    int a；
+}；
+class Child：public Top
+{
+    int b;
+}
+Child的布局结构为：
+有虚函数有虚函数的单一继承">
+
+    
+    <link rel="alternative" href="/atom.xml" title="最初的梦想" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.png">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/pacman.png" alt="最初的梦想" title="最初的梦想"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="最初的梦想">最初的梦想</a></h1>
+				<h2 class="blog-motto">Hello World！</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:github.com/neo-v/neo-v.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015-08-26/Inherit/" title="C++ 继承机制和对象模型" itemprop="url">C++ 继承机制和对象模型</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="https://github.com/neo-v/neo-v.github.io/about" title="Neo" target="_blank" itemprop="author">Neo</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-26T06:35:12.000Z" itemprop="datePublished"> 发表于 Aug 26 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#C++普通单一继承"><span class="toc-number">1.</span> <span class="toc-text">C++普通单一继承</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#无虚函数"><span class="toc-number">1.1.</span> <span class="toc-text">无虚函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#有虚函数"><span class="toc-number">1.2.</span> <span class="toc-text">有虚函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#C++菱形继承"><span class="toc-number">2.</span> <span class="toc-text">C++菱形继承</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#继承布局"><span class="toc-number">2.1.</span> <span class="toc-text">继承布局</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二义性问题"><span class="toc-number">2.2.</span> <span class="toc-text">二义性问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#C++虚拟继承"><span class="toc-number">3.</span> <span class="toc-text">C++虚拟继承</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#内存布局"><span class="toc-number">3.1.</span> <span class="toc-text">内存布局</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<p>关于<strong>C++</strong>语言内存继承机制的学习，学习语言的设计。</p>
+<h2 id="C++普通单一继承">C++普通单一继承</h2><p>C++普通继承，指的是单一继承，分两种情况，有虚函数和没有虚函数。</p>
+<h3 id="无虚函数">无虚函数</h3><p>没有虚函数的单一继承是最简单的。<br>内存布局，即为基类数据+子类数据。<br>比如：</p>
+<pre><code><span class="class"><span class="keyword">class</span> <span class="title">Top</span>
+</span>{
+    <span class="keyword">int</span> a；
+}；
+<span class="class"><span class="keyword">class</span> <span class="title">Child</span>：<span class="title">public</span> <span class="title">Top</span>
+</span>{
+    <span class="keyword">int</span> b;
+}
+</code></pre><p>Child的布局结构为：<br><img src="/assert/danyi.png"></p>
+<h3 id="有虚函数">有虚函数</h3><p>有虚函数的单一继承，有点不同，在于虚函数实现了多态，即子类可以变现出自己的特有行为。为了支持这一特性，虚函数使用了虚函数表来节省内存空间。<br>子类继承虚函数的时候，先初始化虚函数表，依次为父类虚函数和子类虚函数，子类如果实现了父类虚函数，则父类虚函数指向子类实现的虚函数。<br>比如：</p>
+<pre><code><span class="keyword">class</span> Top
+{
+    <span class="keyword">int</span> a；
+    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span></span>{};
+    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span></span>{};
+}；
+<span class="keyword">class</span> Child：<span class="keyword">public</span> Top
+{
+    <span class="keyword">int</span> b;
+    <span class="function"><span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span></span>{};
+    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">test3</span><span class="params">()</span></span>{};
+}
+</code></pre><p>内存布局为：<br><img src="/assert/danyixuhanshu.png"><br><strong>NOTE:</strong><br>这里注意，虚函数和覆盖的不同。如果子类实现的自己的普通函数，恰好与父类普通函数同名，则直接覆盖，即编译时候静态绑定。</p>
+<h2 id="C++菱形继承">C++菱形继承</h2><p>C++支持多重继承，这样有可能形成菱形结构的继承。</p>
+<h3 id="继承布局">继承布局</h3><p>这里做个例子，代码如下：</p>
+<pre><code><span class="keyword">class</span> Top
+{ 
+    <span class="keyword">public</span>: <span class="keyword">int</span> a;
+}; 
+
+<span class="keyword">class</span> Left : <span class="keyword">public</span> Top
+{ 
+    <span class="keyword">public</span>: <span class="keyword">int</span> b;
+}; 
+
+<span class="keyword">class</span> Right :<span class="keyword">public</span> Top
+{ 
+    <span class="keyword">public</span>: <span class="keyword">int</span> c;
+};
+
+<span class="keyword">class</span> Bottom : <span class="keyword">public</span> Left, <span class="keyword">public</span> Right
+{ 
+    <span class="keyword">public</span>: <span class="keyword">int</span> d;
+};
+<span class="comment">//输出测试结果</span>
+<span class="keyword">int</span> <span class="keyword">_t</span>main(<span class="keyword">int</span> argc, _TCHAR* argv[])
+{
+    <span class="keyword">int</span> symbol;
+    Bottom* bottom = <span class="keyword">new</span> Bottom();
+    Left* left = bottom;
+    Right* right = bottom;
+    <span class="comment">//Top *top = bottom;</span>
+    left-&gt;a = <span class="number">1</span>;
+    right-&gt;a = <span class="number">2</span>;
+    <span class="built_in">cout</span> &lt;&lt; <span class="keyword">sizeof</span>(*bottom)&lt;&lt; <span class="string">" "</span> ;
+    <span class="built_in">cout</span> &lt;&lt; left-&gt;a &lt;&lt; <span class="string">" "</span>;
+    <span class="built_in">cout</span> &lt;&lt; right-&gt;a &lt;&lt; <span class="string">" "</span>;
+    <span class="built_in">cout</span> &lt;&lt; left &lt;&lt; <span class="string">" "</span>;
+    <span class="built_in">cout</span> &lt;&lt; right &lt;&lt; <span class="string">" "</span>;
+    <span class="built_in">cout</span> &lt;&lt; bottom &lt;&lt; <span class="string">" "</span>;
+
+    <span class="built_in">cin</span> &gt;&gt; symbol;
+    <span class="keyword">return</span> <span class="number">0</span>;
+}
+</code></pre><p>这里示例代码组成了菱形继承，即基类Top，子类Left，Right，子类的子类：Bottom<br>输出为；<br><img src="/assert/nor_inherit.png"><br>Bottom的大小为20B，存储了5个int数，即<br><img src="/assert/nor_int.png"></p>
+<h3 id="二义性问题">二义性问题</h3><p>这种多重继承存在二义性，即，当我们upcast到Top <em>的时候，a有两个，出现了歧义。<br><img src="/assert/vir_amb.png"><br>为了解决这个问题，c++提出<em>*虚拟继承</em></em>的概念，共享虚拟基类的数据。具体机制如下。</p>
+<h2 id="C++虚拟继承">C++虚拟继承</h2><h3 id="内存布局">内存布局</h3><p>这里做个例子：</p>
+<pre><code><span class="keyword">class</span> Top
+{ 
+    <span class="keyword">public</span>: <span class="keyword">int</span> a;
+}; 
+
+<span class="keyword">class</span> Left : <span class="keyword">virtual</span> <span class="keyword">public</span> Top
+{ 
+    <span class="keyword">public</span>: <span class="keyword">int</span> b;
+}; 
+
+<span class="keyword">class</span> Right :<span class="keyword">virtual</span> <span class="keyword">public</span> Top
+{ 
+    <span class="keyword">public</span>: <span class="keyword">int</span> c;
+};
+
+<span class="keyword">class</span> Bottom : <span class="keyword">public</span> Left, <span class="keyword">public</span> Right
+{ 
+    <span class="keyword">public</span>: <span class="keyword">int</span> d;
+};
+<span class="comment">//输出测试结果</span>
+ <span class="keyword">int</span> <span class="keyword">_t</span>main(<span class="keyword">int</span> argc, _TCHAR* argv[])
+{
+    <span class="keyword">int</span> symbol;
+    Bottom* bottom = <span class="keyword">new</span> Bottom();
+    Left* left = bottom;
+    Right* right = bottom;
+    <span class="comment">//Top *top = bottom;</span>
+    left-&gt;a = <span class="number">1</span>;
+    right-&gt;a = <span class="number">2</span>;
+    <span class="built_in">cout</span> &lt;&lt; <span class="keyword">sizeof</span>(*bottom)&lt;&lt; <span class="string">" "</span> ;
+    <span class="built_in">cout</span> &lt;&lt; left-&gt;a &lt;&lt; <span class="string">" "</span>;
+    <span class="built_in">cout</span> &lt;&lt; right-&gt;a &lt;&lt; <span class="string">" "</span>;
+    <span class="built_in">cout</span> &lt;&lt; left &lt;&lt; <span class="string">" "</span>;
+    <span class="built_in">cout</span> &lt;&lt; right &lt;&lt; <span class="string">" "</span>;
+    <span class="built_in">cout</span> &lt;&lt; bottom &lt;&lt; <span class="string">" "</span>;
+    <span class="built_in">cout</span> &lt;&lt; top &lt;&lt;<span class="string">" "</span> ;
+    <span class="built_in">cout</span> &lt;&lt; *((<span class="keyword">int</span> *)(*(<span class="keyword">int</span>*)left) + <span class="number">1</span>) &lt;&lt; <span class="string">" "</span>;
+    <span class="built_in">cout</span> &lt;&lt; *((<span class="keyword">int</span> *)(*(<span class="keyword">int</span>*)right) + <span class="number">1</span>) &lt;&lt; <span class="string">" "</span>;
+
+    <span class="built_in">cin</span> &gt;&gt; symbol;
+    <span class="keyword">return</span> <span class="number">0</span>;
+}
+</code></pre><p>使用了虚拟继承，语法是继承的时候使用<strong>virtual</strong>关键字。<br>运行结果：<br><img src="/assert/vir_inherit.png"></p>
+<p>可以看到内存为24B，增加了两个虚表函数指针的大小。<br>内存布局为：<br><img src="/assert/vir_int.png"><br>虚拟继承使用了虚表机制，明显的不同<strong>是把共享的基类数据放在最后，通过续表offset来计算位置</strong>。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/编程语言和理论/">编程语言和理论</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/C-继承/">C++继承</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://github.com/neo-v/neo-v.github.io/2015-08-26/Inherit/" data-title="C++ 继承机制和对象模型 | 最初的梦想" data-tsina="undefined" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015-08-21/tcp-part2/"  title="Tcp协议--下篇">
+ <strong>下一篇：</strong><br/> 
+ <span>Tcp协议--下篇
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#C++普通单一继承"><span class="toc-number">1.</span> <span class="toc-text">C++普通单一继承</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#无虚函数"><span class="toc-number">1.1.</span> <span class="toc-text">无虚函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#有虚函数"><span class="toc-number">1.2.</span> <span class="toc-text">有虚函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#C++菱形继承"><span class="toc-number">2.</span> <span class="toc-text">C++菱形继承</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#继承布局"><span class="toc-number">2.1.</span> <span class="toc-text">继承布局</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二义性问题"><span class="toc-number">2.2.</span> <span class="toc-text">二义性问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#C++虚拟继承"><span class="toc-number">3.</span> <span class="toc-text">C++虚拟继承</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#内存布局"><span class="toc-number">3.1.</span> <span class="toc-text">内存布局</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/体系结构/" title="体系结构">体系结构<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/分布式系统/" title="分布式系统">分布式系统<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/助教/" title="助教">助教<sup>8</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/工程理论实践/" title="工程理论实践">工程理论实践<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/操作系统/" title="操作系统">操作系统<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/日志/" title="日志">日志<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法和数据结构/" title="算法和数据结构">算法和数据结构<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/编码/" title="编码">编码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/编程语言和理论/" title="编程语言和理论">编程语言和理论<sup>7</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/计算机网络/" title="计算机网络">计算机网络<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/assistant，embed，Galileo/" title="assistant，embed，Galileo">assistant，embed，Galileo<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/assistant/" title="assistant">assistant<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/网络，Tcp/" title="网络，Tcp">网络，Tcp<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/javascript/" title="javascript">javascript<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/life/" title="life">life<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/linux-process/" title="linux,process">linux,process<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/单例模式/" title="单例模式">单例模式<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/side-effect/" title="side-effect">side-effect<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/分布式，存储/" title="分布式，存储">分布式，存储<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pthread/" title="pthread">pthread<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/线程同步/" title="线程同步">线程同步<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/事务/" title="事务">事务<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/prototype/" title="prototype">prototype<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/oop/" title="oop">oop<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/分布式，log/" title="分布式，log">分布式，log<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/process/" title="process">process<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fork/" title="fork">fork<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/exec/" title="exec">exec<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/软件开发/" title="软件开发">软件开发<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存，分布式，CDN/" title="缓存，分布式，CDN">缓存，分布式，CDN<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="weiboshow">
+  <p class="asidetitle">我的微博</p>
+   <iframe width="100%" height="400" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=400&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=0&uid=2115828167&verifier=7b807bb3&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello,I&#39;m neo <br/>
+			nice to meet you</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/https://github.com/neo-v" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:pirloandkaka@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="https://github.com/neo-v/neo-v.github.io/about" target="_blank" title="Neo">Neo</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
