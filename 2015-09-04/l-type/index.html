@@ -4,32 +4,35 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>助教生活 | 最初的梦想</title>
+    <title>编程语言类型系统概念浅析 | 最初的梦想</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Neo">
     
 
     
-    <meta name="description" content="实验4 交叉编译grub
-不得不说，老师的ppt真心没法用。只能照着文档自己做。交叉编译grub，按照BSP guider来make就可以了。原来grub的硬盘分区是以0开始编号的，也就是linux下hda5，grub表达是(hd0,4)。
-编译spi镜像，修改配置文件，bitbake image-spi一下就可以了。
-为了编译flash文件，还需要编译EDKII，用它来给spi重新编程。安装相关">
+    <meta name="description" content="类型的作用
+指示变量的操作整形和浮点数的表示是不同的，对他们的计算也是不同的。cpu需要知道进行哪种数据操作。这是类型系统的起源。
+面向对象支持用户自定义类型，并将自定义数据执行的操作，即函数也加入到类型系统，有了对象的概念。将数据和数据的操作耦合，加上访问控制，减少错误的发生。
+模板支持多种类型的表达。
+类型即功能一种编程理念，即类型作为功能出现，对外暴露最小接口进行交互。典型的，Java中的r">
 <meta property="og:type" content="article">
-<meta property="og:title" content="助教生活">
-<meta property="og:url" content="https://github.com/neo-v/neo-v.github.io/2015-04-08/assistant-4/index.html">
+<meta property="og:title" content="编程语言类型系统概念浅析">
+<meta property="og:url" content="https://github.com/neo-v/neo-v.github.io/2015-09-04/l-type/index.html">
 <meta property="og:site_name" content="最初的梦想">
-<meta property="og:description" content="实验4 交叉编译grub
-不得不说，老师的ppt真心没法用。只能照着文档自己做。交叉编译grub，按照BSP guider来make就可以了。原来grub的硬盘分区是以0开始编号的，也就是linux下hda5，grub表达是(hd0,4)。
-编译spi镜像，修改配置文件，bitbake image-spi一下就可以了。
-为了编译flash文件，还需要编译EDKII，用它来给spi重新编程。安装相关">
-<meta property="og:updated_time" content="2015-07-25T01:18:12.000Z">
+<meta property="og:description" content="类型的作用
+指示变量的操作整形和浮点数的表示是不同的，对他们的计算也是不同的。cpu需要知道进行哪种数据操作。这是类型系统的起源。
+面向对象支持用户自定义类型，并将自定义数据执行的操作，即函数也加入到类型系统，有了对象的概念。将数据和数据的操作耦合，加上访问控制，减少错误的发生。
+模板支持多种类型的表达。
+类型即功能一种编程理念，即类型作为功能出现，对外暴露最小接口进行交互。典型的，Java中的r">
+<meta property="og:updated_time" content="2015-09-04T04:08:54.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="助教生活">
-<meta name="twitter:description" content="实验4 交叉编译grub
-不得不说，老师的ppt真心没法用。只能照着文档自己做。交叉编译grub，按照BSP guider来make就可以了。原来grub的硬盘分区是以0开始编号的，也就是linux下hda5，grub表达是(hd0,4)。
-编译spi镜像，修改配置文件，bitbake image-spi一下就可以了。
-为了编译flash文件，还需要编译EDKII，用它来给spi重新编程。安装相关">
+<meta name="twitter:title" content="编程语言类型系统概念浅析">
+<meta name="twitter:description" content="类型的作用
+指示变量的操作整形和浮点数的表示是不同的，对他们的计算也是不同的。cpu需要知道进行哪种数据操作。这是类型系统的起源。
+面向对象支持用户自定义类型，并将自定义数据执行的操作，即函数也加入到类型系统，有了对象的概念。将数据和数据的操作耦合，加上访问控制，减少错误的发生。
+模板支持多种类型的表达。
+类型即功能一种编程理念，即类型作为功能出现，对外暴露最小接口进行交互。典型的，Java中的r">
 
     
     <link rel="alternative" href="/atom.xml" title="最初的梦想" type="application/atom+xml">
@@ -89,14 +92,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015-04-08/assistant-4/" title="助教生活" itemprop="url">助教生活</a>
+      <a href="/2015-09-04/l-type/" title="编程语言类型系统概念浅析" itemprop="url">编程语言类型系统概念浅析</a>
   </h1>
   <p class="article-author">By
        
 		<a href="https://github.com/neo-v/neo-v.github.io/about" title="Neo" target="_blank" itemprop="author">Neo</a>
 		
   <p class="article-time">
-    <time datetime="2015-04-07T16:52:16.000Z" itemprop="datePublished"> 发表于 Apr 8 2015</time>
+    <time datetime="2015-09-04T04:06:47.000Z" itemprop="datePublished"> 发表于 Sep 4 2015</time>
     
   </p>
 </header>
@@ -105,16 +108,40 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#类型的作用"><span class="toc-number">1.</span> <span class="toc-text">类型的作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#类型检查(check)"><span class="toc-number">2.</span> <span class="toc-text">类型检查(check)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#面向对象"><span class="toc-number">3.</span> <span class="toc-text">面向对象</span></a></li></ol>
 		
 		</div>
 		
-		<p><strong>实验4 交叉编译grub</strong></p>
-<p>不得不说，老师的ppt真心没法用。只能照着文档自己做。<br>交叉编译grub，按照BSP guider来make就可以了。原来grub的硬盘分区是以0开始编号的，也就是linux下hda5，<strong>grub表达是(hd0,4)</strong>。</p>
-<p>编译spi镜像，修改配置文件，bitbake image-spi一下就可以了。</p>
-<p>为了编译flash文件，还需要编译EDKII，用它来给spi重新编程。安装相关依赖，并打上openssl的补丁即可。</p>
-<p>编译flash.cap文件，使用makefile脚本来编译。需要给相关文件做软链接，以便链接到正确的位置。还需要额外配置EDKII中GCC文件夹的路径匹配配置文件。如果spi-flash-tools里包括的basetools不和系统兼容的话，还要设置变量BASETOOLS为EDKII的basetools的路径。</p>
-<p><strong>虽然出了很多状况，但是蛮享受解决问题的过程。解决问题的能力是通用的。</strong></p>
+		<h3 id="类型的作用">类型的作用</h3><ol>
+<li>指示变量的操作<br>整形和浮点数的表示是不同的，对他们的计算也是不同的。cpu需要知道进行哪种数据操作。这是类型系统的起源。</li>
+<li>面向对象<br>支持用户自定义类型，并将自定义数据执行的操作，即函数也加入到类型系统，有了对象的概念。将数据和数据的操作耦合，加上访问控制，减少错误的发生。</li>
+<li>模板<br>支持多种类型的表达。</li>
+<li><p>类型即功能<br>一种编程理念，即类型作为功能出现，对外暴露最小接口进行交互。典型的，Java中的runnable接口。Java中创建线程的一个方法：</p>
+<pre><code>Java.lang.Runnable接口 
+<span class="keyword">package</span> java.lang;
+<span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Runnable</span> </span>{
+    <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>;
+}
+Thead t = <span class="keyword">new</span> Thread (Runnable <span class="keyword">target</span>)
+</code></pre><p>这里，只要实现一个runnable类型，就可以作为Thread的参数，启动一个线程。而不用管run()方法如何实现。<br>类型就代表了功能。如果编译没有错误，既可以认为程序没有bug。</p>
+</li>
+</ol>
+<h3 id="类型检查(check)">类型检查(check)</h3><p>编程语言有一些概念是没有学术定义。存在会让人摸不清边界。这里试着理清一下。<br>由于编程语言存在类型系统，而且担任了比较重要的功能。不仅表示了数据的操作，还附加了其他机制，比如类型及功能，模板，异常处理等。<br>编程语言在使用类型系统的时候，需要注意一些常见的错误。这些错误最好能在语言层面检测出来。<br>编程语言类型系统的分类视角大致如下：</p>
+<ul>
+<li>强类型<br>对类型的检测严格。通俗讲不允许类型做隐式转化。</li>
+<li>弱类型<br>对类型的检测不严格。可以做隐式转化。</li>
+<li>静态类型<br>说的是检测的时机，检测发生在编译时期，类型在编译时确定。</li>
+<li>动态类型<br>检测时期发生在运行时，类型在运行时第一次赋值确定。</li>
+<li>类型推断<br>兼具静态和动态的特点。书写时不用直接申明类型，而是自动推导。运行时不用做检测。</li>
+<li>常见编程语言分类<br>C/C++,Java等都是静态，弱类型。<br>Python是动态，强类型。</li>
+</ul>
+<h3 id="面向对象">面向对象</h3><p>面向对象可以看做类型系统的一大发明，从图灵机的角度，内部需要保护，但是对外交互需要接口，于是在面向对象语言有了常见的编程模式：</p>
+<ul>
+<li>set()<br>设置状态</li>
+<li>get()<br>获取状态</li>
+<li>优点<br>面向接口编程，简化了外部耦合度</li>
+<li>弱点<br>容易产生冗余代码。</li>
+</ul>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -122,13 +149,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/助教/">助教</a>
+  <a class="article-category-link" href="/categories/编程语言和理论/">编程语言和理论</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Galileo-Gen2/">Galileo Gen2</a><a href="/tags/embed/">embed</a>
+  <span></span> <a href="/tags/类型系统/">类型系统</a>
   </div>
 
 </div>
@@ -137,7 +164,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="https://github.com/neo-v/neo-v.github.io/2015-04-08/assistant-4/" data-title="助教生活 | 最初的梦想" data-tsina="undefined" class="share clearfix">
+	  <div data-url="https://github.com/neo-v/neo-v.github.io/2015-09-04/l-type/" data-title="编程语言类型系统概念浅析 | 最初的梦想" data-tsina="undefined" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -150,19 +177,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015-04-10/prototype/" title="js prototype 理解">
-  <strong>上一篇：</strong><br/>
-  <span>
-  js prototype 理解</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015-04-07/process-new/"  title="理解linux进程第二篇">
+<a href="/2015-08-26/Inherit/"  title="C++ 继承机制和对象模型">
  <strong>下一篇：</strong><br/> 
- <span>理解linux进程第二篇
+ <span>C++ 继承机制和对象模型
 </span>
 </a>
 </div>
@@ -177,7 +196,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#类型的作用"><span class="toc-number">1.</span> <span class="toc-text">类型的作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#类型检查(check)"><span class="toc-number">2.</span> <span class="toc-text">类型检查(check)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#面向对象"><span class="toc-number">3.</span> <span class="toc-text">面向对象</span></a></li></ol>
  
   </div>
 
